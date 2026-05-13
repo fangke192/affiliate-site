@@ -2,47 +2,47 @@
   "products": [
     {
       "name": "百度网盘",
-      "note": "注册任推邦(rentuibang.com)获取推广链接",
+      "note": "",
       "urls": []
     },
     {
       "name": "Notion",
-      "note": "Notion 联盟需要 PayPal 收款，暂不支持",
+      "note": "",
       "urls": []
     },
     {
       "name": "Obsidian",
-      "note": "Obsidian 无官方联盟计划",
+      "note": "",
       "urls": []
     },
     {
       "name": "飞书文档",
-      "note": "飞书无公开联盟计划",
+      "note": "",
       "urls": []
     },
     {
       "name": "DeepSeek",
-      "note": "DeepSeek 无联盟计划",
+      "note": "",
       "urls": []
     },
     {
       "name": "Claude",
-      "note": "Claude 无联盟计划",
+      "note": "",
       "urls": []
     },
     {
       "name": "ChatGPT",
-      "note": "OpenAI 联盟需通过第三方平台",
+      "note": "",
       "urls": []
     },
     {
       "name": "Google Drive",
-      "note": "Google Drive 无公开联盟计划",
+      "note": "",
       "urls": []
     },
     {
       "name": "Dropbox",
-      "note": "Dropbox 推荐计划只赠送存储空间",
+      "note": "",
       "urls": []
     }
   ]
