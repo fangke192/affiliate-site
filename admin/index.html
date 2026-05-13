@@ -631,8 +631,9 @@ function renderPosts() {
     const name = p.name.replace(/\.md$/, '');
     const datePart = name.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] || '';
     const titlePart = name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-/g, ' ');
-    // Check if pinned by looking at content (stored from listDir)
-    // We store pin status in a map since we don't have content here
+    // Safe string for onclick attr (escape quotes)
+    const safeName = p.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const safeSha = p.sha.replace(/'/g, "\\'");
     const pinBtnClass = p.pinned ? 'btn-green' : 'btn-outline';
     const pinText = p.pinned ? '📌 已置顶' : '📌 置顶';
     html += `<div class="post-item">
@@ -641,9 +642,9 @@ function renderPosts() {
         <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB${p.category ? ' · ' + p.category : ''}</div>
       </div>
       <div class="post-actions">
-        <button class="btn ${pinBtnClass} btn-xs" onclick="togglePin('${p.name}')">${pinText}</button>
+        <button class="btn ${pinBtnClass} btn-xs" onclick="togglePin('${safeName}')">${pinText}</button>
         <a href="https://${OWNER}.github.io/${REPO}/${p.category ? p.category + '/' : ''}${name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-manual$/, '')}/" target="_blank" class="btn btn-outline btn-xs">查看</a>
-        <button class="btn btn-danger btn-xs" onclick="deletePost('${p.name}','${p.sha}')">删除</button>
+        <button class="btn btn-danger btn-xs" onclick="deletePost('${safeName}','${safeSha}')">删除</button>
       </div>
     </div>`;
   });
