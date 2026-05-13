@@ -9,7 +9,6 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
 exclude:
-  - admin/
   - README.md
   - config.yaml
   - scripts/
