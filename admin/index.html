@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 - 工具推荐站</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; color: #333; font-size: 14px; }
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+/* Login */
+.login-screen { max-width: 400px; margin: 100px auto; background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.login-screen h1 { text-align: center; font-size: 22px; margin-bottom: 8px; }
+.login-screen p { text-align: center; color: #888; margin-bottom: 24px; font-size: 13px; }
+.login-screen label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+.login-screen input { width: 100%; padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; margin-bottom: 16px; }
+.login-screen input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+.btn { display: inline-block; padding: 10px 24px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+.btn-primary { background: #2563eb; color: #fff; width: 100%; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-primary:disabled { background: #93b4f5; cursor: not-allowed; }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-outline { background: #fff; color: #333; border: 1px solid #d9d9d9; }
+.btn-outline:hover { border-color: #2563eb; color: #2563eb; }
+.btn-sm { padding: 6px 16px; font-size: 13px; }
+.error { color: #ef4444; font-size: 13px; margin-top: 8px; }
+.success { color: #16a34a; font-size: 13px; margin-top: 8px; }
+
+/* Header */
+.header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 12px 0; margin-bottom: 24px; }
+.header .container { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+.header h1 { font-size: 18px; }
+.header .user-info { color: #888; font-size: 12px; }
+.header .logout { color: #ef4444; cursor: pointer; margin-left: 12px; font-size: 13px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #fff; border-radius: 10px; padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.tab { flex: 1; padding: 10px; text-align: center; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 14px; color: #666; transition: all 0.2s; }
+.tab:hover { background: #f3f4f6; }
+.tab.active { background: #2563eb; color: #fff; font-weight: 500; }
+
+/* Cards */
+.card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.card h2 { font-size: 16px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+.card label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+.card .hint { color: #888; font-size: 12px; margin-bottom: 8px; }
+.card input, .card textarea, .card select { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; margin-bottom: 12px; }
+.card input:focus, .card textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+.card textarea { min-height: 60px; resize: vertical; font-family: monospace; font-size: 13px; }
+.save-status { display: inline-block; margin-left: 12px; font-size: 13px; }
+
+/* Spinner */
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear; margin-right: 6px; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container { padding: 12px; }
+  .card { padding: 16px; }
+  .tabs { flex-wrap: wrap; }
+  .tab { flex: 1 1 45%; font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+const OWNER = 'fangke192';
+const REPO = 'affiliate-site';
+const BRANCH = 'main';
+
+// ---------- State ----------
+let state = {
+  token: '',
+  user: null,
+  tab: 'affiliate',
+  affiliateData: null,
+  adsYml: '',
+  saving: false,
+  message: '',
+  loading: false,
+  workflowRunning: false,
+};
+
+// ---------- GitHub API ----------
+async function gh(method, path, body) {
+  const r = await fetch(`https://api.github.com${path}`, {
+    method,
+    headers: {
+      'Authorization': `token ${state.token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'Admin/1.0',
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = r.headers.get('content-type')?.includes('json') ? await r.json() : await r.text();
+  if (!r.ok) throw new Error(typeof data === 'object' ? (data.message || r.statusText) : `HTTP ${r.status}`);
+  return { status: r.status, data };
+}
+
+async function getFile(path) {
+  try {
+    const { data } = await gh('GET', `/repos/${OWNER}/${REPO}/contents/${path}`);
+    return {
+      content: atob(data.content.replace(/\n/g, '')),
+      sha: data.sha,
+    };
+  } catch (e) {
+    if (e.message.includes('Not Found') || e.message.includes('404')) return null;
+    throw e;
+  }
+}
+
+async function saveFile(path, content, sha) {
+  const body = {
+    message: `admin: update ${path}`,
+    content: btoa(unescape(encodeURIComponent(content))),
+    branch: BRANCH,
+  };
+  if (sha) body.sha = sha;
+  const { data } = await gh('PUT', `/repos/${OWNER}/${REPO}/contents/${path}`, body);
+  return data.content.sha;
+}
+
+function btoa(str) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  let output = '';
+  const bytes = new TextEncoder().encode(str);
+  for (let i = 0; i < bytes.length; i += 3) {
+    const b1 = bytes[i], b2 = bytes[i+1] || 0, b3 = bytes[i+2] || 0;
+    output += chars[b1 >> 2] + chars[((b1 & 3) << 4) | (b2 >> 4)] + chars[((b2 & 15) << 2) | (b3 >> 6)] + chars[b3 & 63];
+  }
+  if (bytes.length % 3 === 1) output = output.slice(0, -2) + '==';
+  else if (bytes.length % 3 === 2) output = output.slice(0, -1) + '=';
+  return output;
+}
+
+// ---------- Render ----------
+function render() {
+  if (!state.token) return renderLogin();
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="header">
+      <div class="container">
+        <h1>📊 管理后台</h1>
+        <div>
+          <span class="user-info">${state.user || ''}</span>
+          <a class="logout" onclick="logout()">退出</a>
+          <a href="https://${OWNER}.github.io/${REPO}" target="_blank" style="margin-left:12px;font-size:13px;color:#2563eb;">查看网站 →</a>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="tabs">
+        <button class="tab ${state.tab === 'affiliate' ? 'active' : ''}" onclick="switchTab('affiliate')">🔗 推广链接</button>
+        <button class="tab ${state.tab === 'ads' ? 'active' : ''}" onclick="switchTab('ads')">📢 广告代码</button>
+        <button class="tab ${state.tab === 'generate' ? 'active' : ''}" onclick="switchTab('generate')">⚡ 生成文章</button>
+      </div>
+      <div id="tab-content">${state.loading ? '<div class="card" style="text-align:center;padding:60px;"><div class="spinner"></div> 加载中...</div>' : ''}</div>
+    </div>
+  `;
+  if (!state.loading) {
+    if (state.tab === 'affiliate') renderAffiliate();
+    else if (state.tab === 'ads') renderAds();
+    else if (state.tab === 'generate') renderGenerate();
+  }
+  if (state.message) {
+    setTimeout(() => { state.message = ''; render(); }, 3000);
+  }
+}
+
+function renderLogin() {
+  document.getElementById('app').innerHTML = `
+    <div class="login-screen">
+      <h1>🔐 管理后台</h1>
+      <p>输入你的 GitHub Token 登录管理后台<br>Token 仅保存在当前浏览器会话中</p>
+      <label>GitHub Personal Access Token</label>
+      <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx" onkeydown="if(event.key==='Enter')login()">
+      <button class="btn btn-primary" id="login-btn" onclick="login()">登录</button>
+      <div id="login-error" class="error"></div>
+    </div>
+  `;
+  document.getElementById('token-input').focus();
+}
+
+// ---------- Actions ----------
+async function login() {
+  const input = document.getElementById('token-input');
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  state.token = input.value.trim();
+  if (!state.token) { err.textContent = '请输入 Token'; return; }
+  btn.disabled = true;
+  btn.textContent = '验证中...';
+  try {
+    const { data } = await gh('GET', '/user');
+    state.user = data.login;
+    state.loading = true;
+    render();
+    await loadData();
+    state.loading = false;
+    render();
+  } catch (e) {
+    err.textContent = '验证失败: ' + e.message;
+    state.token = '';
+    btn.disabled = false;
+    btn.textContent = '登录';
+  }
+}
+
+function logout() {
+  state = { token: '', user: null, tab: 'affiliate', affiliateData: null, adsYml: '', saving: false, message: '', loading: false, workflowRunning: false };
+  render();
+}
+
+function switchTab(tab) {
+  state.tab = tab;
+  state.loading = true;
+  render();
+  loadData().then(() => { state.loading = false; render(); });
+}
+
+async function loadData() {
+  if (state.tab === 'affiliate') {
+    const file = await getFile('config/affiliate_links.json');
+    state.affiliateData = file ? JSON.parse(file.content) : null;
+  } else if (state.tab === 'ads') {
+    const file = await getFile('_data/ads.yml');
+    state.adsYml = file ? file.content : '# 广告配置\nenabled: false\npost_bottom: ""\nhome_bottom: ""\nsidebar: ""';
+  }
+}
+
+// ---------- Affiliate Tab ----------
+function renderAffiliate() {
+  const content = document.getElementById('tab-content');
+  if (!state.affiliateData) {
+    content.innerHTML = '<div class="card" style="text-align:center;padding:60px;color:#888;">无法加载推广链接配置</div>';
+    return;
+  }
+  const products = state.affiliateData.products || {};
+  let html = '<div class="card"><h2>🔗 推广链接管理</h2><p class="hint">填写各产品的推广链接后保存，下次生成的文章会自动带上</p>';
+  for (const [name, info] of Object.entries(products)) {
+    const note = info._note || '';
+    const url = info.url || '';
+    html += `
+      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #eee;">
+        <label>${name}</label>
+        <input type="url" id="aff-${name}" value="${escapeHtml(url)}" placeholder="https://..." onchange="markDirty()">
+        <div class="hint">${escapeHtml(note)}</div>
+      </div>
+    `;
+  }
+  html += `
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="saveAffiliate()" id="aff-save-btn">💾 保存推广链接</button>
+      <span id="aff-status" class="save-status"></span>
+    </div>
+  </div>`;
+  content.innerHTML = html;
+}
+
+function markDirty() {
+  document.getElementById('aff-status').textContent = '⚠️ 未保存';
+  document.getElementById('aff-status').style.color = '#d97706';
+}
+
+async function saveAffiliate() {
+  const btn = document.getElementById('aff-save-btn');
+  const status = document.getElementById('aff-status');
+  btn.disabled = true;
+  status.innerHTML = '<span class="spinner"></span> 保存中...';
+  try {
+    const products = state.affiliateData.products || {};
+    for (const name of Object.keys(products)) {
+      products[name].url = document.getElementById(`aff-${name}`).value.trim();
+    }
+    const content = JSON.stringify(state.affiliateData, null, 2);
+    const file = await getFile('config/affiliate_links.json');
+    await saveFile('config/affiliate_links.json', content, file ? file.sha : null);
+    state.affiliateData = JSON.parse(content);
+    status.textContent = '✅ 保存成功！';
+    status.style.color = '#16a34a';
+  } catch (e) {
+    status.textContent = '❌ 保存失败: ' + e.message;
+    status.style.color = '#ef4444';
+  }
+  btn.disabled = false;
+}
+
+// ---------- Ads Tab ----------
+function renderAds() {
+  const content = document.getElementById('tab-content');
+  const yml = state.adsYml;
+  // Parse simple YAML to pre-fill fields
+  const enabled = yml.match(/^enabled:\s*(true|false)/m)?.[1] === 'true';
+  const postBottom = yml.match(/^post_bottom:\s*"([^]*?)"$/m)?.[1] || yml.match(/^post_bottom:\s*'([^]*?)'$/m)?.[1] || '';
+  const homeBottom = yml.match(/^home_bottom:\s*"([^]*?)"$/m)?.[1] || '';
+  const sidebar = yml.match(/^sidebar:\s*"([^]*?)"$/m)?.[1] || '';
+
+  content.innerHTML = `
+    <div class="card">
+      <h2>📢 广告代码管理</h2>
+      <p class="hint">在此粘贴你的广告代码（支持百度联盟、Google AdSense 等任意广告代码）<br>
+      广告将在下次网站重新构建后生效（触发"生成文章"后自动构建）</p>
+
+      <div style="margin-bottom:16px;">
+        <label>启用广告</label>
+        <select id="ads-enabled">
+          <option value="false" ${!enabled ? 'selected' : ''}>关闭</option>
+          <option value="true" ${enabled ? 'selected' : ''}>开启</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>文章底部广告</label>
+        <div class="hint">展示在每篇文章的底部</div>
+        <textarea id="ads-post-bottom" rows="4" style="font-family:monospace;font-size:13px;">${escapeHtml(postBottom)}</textarea>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label>首页底部广告</label>
+        <div class="hint">展示在首页文章列表下方</div>
+        <textarea id="ads-home-bottom" rows="4" style="font-family:monospace;font-size:13px;">${escapeHtml(homeBottom)}</textarea>
+      </div>
+
+      <div>
+        <button class="btn btn-primary" onclick="saveAds()" id="ads-save-btn">💾 保存广告配置</button>
+        <span id="ads-status" class="save-status"></span>
+      </div>
+    </div>
+  `;
+}
+
+async function saveAds() {
+  const btn = document.getElementById('ads-save-btn');
+  const status = document.getElementById('ads-status');
+  btn.disabled = true;
+  status.innerHTML = '<span class="spinner"></span> 保存中...';
+  try {
+    const enabled = document.getElementById('ads-enabled').value;
+    const postBottom = document.getElementById('ads-post-bottom').value;
+    const homeBottom = document.getElementById('ads-home-bottom').value;
+    // Build YAML
+    let yml = '# 广告配置\n';
+    yml += `enabled: ${enabled}\n`;
+    yml += `post_bottom: "${postBottom.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"\n`;
+    yml += `home_bottom: "${homeBottom.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"\n`;
+    yml += `sidebar: ""\n`;
+
+    const file = await getFile('_data/ads.yml');
+    await saveFile('_data/ads.yml', yml, file ? file.sha : null);
+    state.adsYml = yml;
+    status.textContent = '✅ 保存成功！网站下次构建后将生效';
+    status.style.color = '#16a34a';
+  } catch (e) {
+    status.textContent = '❌ 保存失败: ' + e.message;
+    status.style.color = '#ef4444';
+  }
+  btn.disabled = false;
+}
+
+// ---------- Generate Tab ----------
+function renderGenerate() {
+  const content = document.getElementById('tab-content');
+  content.innerHTML = `
+    <div class="card">
+      <h2>⚡ 手动生成文章</h2>
+      <p class="hint">点击按钮立即触发 GitHub Actions 工作流，生成新的 SEO 文章并部署到网站</p>
+      <div style="margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="triggerWorkflow()" id="gen-btn" style="width:auto;">🚀 立即生成文章</button>
+        <span id="gen-status" class="save-status"></span>
+      </div>
+      <div style="background:#f9fafb;border-radius:8px;padding:16px;font-size:13px;color:#666;">
+        <strong>自动化说明：</strong><br>
+        • 每周一 00:00 UTC 自动运行<br>
+        • 每次随机选取 3 个分类生成文章<br>
+        • 每篇文章包含功能对比、优缺点分析、推广链接<br>
+        • 生成后自动部署到 GitHub Pages
+      </div>
+    </div>
+    <div class="card">
+      <h2>📋 快捷操作</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" class="btn btn-outline btn-sm">查看工作流运行记录</a>
+        <a href="https://github.com/${OWNER}/${REPO}/" target="_blank" class="btn btn-outline btn-sm">访问 GitHub 仓库</a>
+        <a href="https://${OWNER}.github.io/${REPO}/" target="_blank" class="btn btn-outline btn-sm">查看网站</a>
+      </div>
+    </div>
+  `;
+}
+
+async function triggerWorkflow() {
+  const btn = document.getElementById('gen-btn');
+  const status = document.getElementById('gen-status');
+  btn.disabled = true;
+  status.innerHTML = '<span class="spinner"></span> 触发中...';
+  try {
+    await gh('POST', `/repos/${OWNER}/${REPO}/actions/workflows/deploy.yml/dispatches`, { ref: BRANCH });
+    status.innerHTML = '✅ 已触发！等待 2-3 分钟后查看网站更新 <a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" style="color:#2563eb;">查看进度</a>';
+    status.style.color = '#16a34a';
+  } catch (e) {
+    status.textContent = '❌ 触发失败: ' + e.message;
+    status.style.color = '#ef4444';
+  }
+  btn.disabled = false;
+}
+
+// ---------- Utils ----------
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// ---------- Init ----------
+// Check if token saved in session
+const savedToken = sessionStorage.getItem('admin_token');
+if (savedToken) {
+  state.token = savedToken;
+  state.loading = true;
+  render();
+  gh('GET', '/user').then(({ data }) => {
+    state.user = data.login;
+    return loadData();
+  }).then(() => {
+    state.loading = false;
+    render();
+  }).catch(() => {
+    state.token = '';
+    state.loading = false;
+    render();
+  });
+} else {
+  render();
+}
+
+// Save token to session on login
+const origLogin = login;
+login = async function() {
+  await origLogin.call(this);
+  if (state.token) sessionStorage.setItem('admin_token', state.token);
+};
+</script>
+</body>
+</html>
