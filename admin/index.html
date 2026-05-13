@@ -139,6 +139,18 @@ function toast(msg, type='success') {
   setTimeout(() => el.remove(), 2500);
 }
 
+function rebuildToast(msg) {
+  // Remove existing rebuild toast
+  const old = document.getElementById('rebuild-toast');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'rebuild-toast';
+  el.className = 'toast info';
+  el.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;color:#fff;font-size:14px;z-index:999;background:#d97706;box-shadow:0 2px 12px rgba(0,0,0,0.15);animation:fadeIn 0.3s;';
+  el.textContent = msg;
+  document.body.appendChild(el);
+}
+
 // ---------- GitHub API ----------
 async function gh(method, path, body) {
   const r = await fetch(`https://api.github.com${path}`, {
@@ -283,7 +295,15 @@ async function loadTabData() {
   } else if (state.tab === 'posts') {
     try {
       const items = await listDir('_posts');
-      state.posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
+      let posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
+      // 并行读取每篇文章的 front matter 获取置顶状态
+      await Promise.all(posts.map(async (p) => {
+        try {
+          const file = await getFile(`_posts/${p.name}`);
+          p.pinned = file ? /^pinned:\s*true/m.test(file.content) : false;
+        } catch(e) { p.pinned = false; }
+      }));
+      state.posts = posts;
     } catch(e) {
       state.posts = [];
     }
@@ -596,13 +616,15 @@ function renderPosts() {
     const titlePart = name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-/g, ' ');
     // Check if pinned by looking at content (stored from listDir)
     // We store pin status in a map since we don't have content here
+    const pinBtnClass = p.pinned ? 'btn-green' : 'btn-outline';
+    const pinText = p.pinned ? '📌 已置顶' : '📌 置顶';
     html += `<div class="post-item">
       <div class="post-info">
-        <div class="post-title">${escapeHtml(titlePart)}</div>
+        <div class="post-title">${escapeHtml(titlePart)} ${p.pinned ? '<span style="color:#eab308;font-size:12px;">📌</span>' : ''}</div>
         <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB</div>
       </div>
       <div class="post-actions">
-        <button class="btn btn-outline btn-xs" onclick="togglePin('${p.name}')">📌 置顶</button>
+        <button class="btn ${pinBtnClass} btn-xs" onclick="togglePin('${p.name}')">${pinText}</button>
         <a href="https://${OWNER}.github.io/${REPO}/${name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-manual$/, '')}/" target="_blank" class="btn btn-outline btn-xs">查看</a>
         <button class="btn btn-danger btn-xs" onclick="deletePost('${p.name}','${p.sha}')">删除</button>
       </div>
@@ -622,6 +644,9 @@ async function deletePost(name, sha) {
     toast(`✅ 已删除 ${name}`);
     state.posts = state.posts.filter(p => p.name !== name);
     renderPosts();
+    // 触发 Pages 重构建，让前端不再显示已删除的文章
+    rebuildToast('触发网站重构建中，约 1-2 分钟后生效...');
+    triggerPagesBuild().catch(() => {});
   } catch(e) { toast('删除失败: ' + e.message, 'error'); }
 }
 
@@ -640,10 +665,20 @@ async function togglePin(name) {
     }
     await saveFile(`_posts/${name}`, content, file.sha);
     toast(isPinned ? '已取消置顶' : '✅ 已置顶');
-    // Refresh list
+    // Refresh list with pin states
     const items = await listDir('_posts');
-    state.posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
+    let posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
+    await Promise.all(posts.map(async (p) => {
+      try {
+        const f = await getFile(`_posts/${p.name}`);
+        p.pinned = f ? /^pinned:\s*true/m.test(f.content) : false;
+      } catch(e) { p.pinned = false; }
+    }));
+    state.posts = posts;
     renderPosts();
+    // 触发 Pages 重构建
+    rebuildToast('触发网站重构建中，约 1-2 分钟后生效...');
+    triggerPagesBuild().catch(() => {});
   } catch(e) { toast('操作失败: ' + e.message, 'error'); }
 }
 
@@ -691,12 +726,17 @@ async function triggerWorkflow() {
 
 async function triggerPagesBuild() {
   const status = document.getElementById('gen-status');
-  status.innerHTML = '<span class="spinner"></span> 请求中...';
   try {
+    if (status) status.innerHTML = '<span class="spinner"></span> 请求中...';
     await gh('POST', `/repos/${OWNER}/${REPO}/pages/builds`);
-    toast('✅ Pages 构建已触发');
-    status.textContent = '✅ 构建已触发';
-  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
+    toast('✅ Pages 构建已触发！1-2 分钟后生效');
+    if (status) status.textContent = '✅ 构建已触发';
+  } catch(e) {
+    if (status) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
+    toast('构建触发失败: ' + e.message, 'error');
+  }
+  const rt = document.getElementById('rebuild-toast');
+  if (rt) rt.remove();
 }
 
 // ===================== INIT =====================
