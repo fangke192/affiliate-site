@@ -9,7 +9,17 @@ title: 首页
 </div>
 
 <div class="post-grid">
-  {% for post in site.posts %}
+  {% assign pinned = site.posts | where: "pinned", true %}
+  {% assign normal = site.posts | where_exp: "p", "p.pinned != true" %}
+  {% for post in pinned %}
+  <div class="post-card pinned">
+    <div class="post-meta">{{ post.date | date: "%Y-%m-%d" }} · 📌 置顶</div>
+    <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+    <p class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</p>
+    <a href="{{ post.url | relative_url }}" class="read-more">阅读全文 →</a>
+  </div>
+  {% endfor %}
+  {% for post in normal %}
   <div class="post-card">
     <div class="post-meta">{{ post.date | date: "%Y-%m-%d" }}</div>
     <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>

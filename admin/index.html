@@ -588,17 +588,21 @@ function renderPosts() {
   }
   let html = `<div class="card">
     <h2>📋 文章管理 (${state.posts.length} 篇)</h2>
+    <p class="hint">已置顶的文章会在首页优先展示</p>
     <div id="post-list">`;
   state.posts.forEach(p => {
     const name = p.name.replace(/\.md$/, '');
     const datePart = name.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] || '';
     const titlePart = name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-/g, ' ');
+    // Check if pinned by looking at content (stored from listDir)
+    // We store pin status in a map since we don't have content here
     html += `<div class="post-item">
       <div class="post-info">
         <div class="post-title">${escapeHtml(titlePart)}</div>
-        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB · ${p.sha.slice(0,7)}</div>
+        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB</div>
       </div>
       <div class="post-actions">
+        <button class="btn btn-outline btn-xs" onclick="togglePin('${p.name}')">📌 置顶</button>
         <a href="https://${OWNER}.github.io/${REPO}/${name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-manual$/, '')}/" target="_blank" class="btn btn-outline btn-xs">查看</a>
         <button class="btn btn-danger btn-xs" onclick="deletePost('${p.name}','${p.sha}')">删除</button>
       </div>
@@ -611,11 +615,36 @@ function renderPosts() {
 async function deletePost(name, sha) {
   if (!confirm(`确定删除文章「${name}」？此操作不可恢复！`)) return;
   try {
-    await deleteFile(`_posts/${name}`, sha);
+    // 先获取文件最新 SHA（目录列表的 SHA 可能不准确）
+    const file = await getFile(`_posts/${name}`);
+    if (!file) { toast('文件不存在', 'error'); return; }
+    await deleteFile(`_posts/${name}`, file.sha);
     toast(`✅ 已删除 ${name}`);
     state.posts = state.posts.filter(p => p.name !== name);
     renderPosts();
   } catch(e) { toast('删除失败: ' + e.message, 'error'); }
+}
+
+async function togglePin(name) {
+  try {
+    const file = await getFile(`_posts/${name}`);
+    if (!file) { toast('文件不存在', 'error'); return; }
+    let content = file.content;
+    // Check if already pinned
+    const isPinned = /^pinned:\s*true/m.test(content);
+    if (isPinned) {
+      content = content.replace(/^pinned:\s*true\s*\n/m, '');
+    } else {
+      // Add pinned: true after the first --- line
+      content = content.replace(/^---\n/, '---\npinned: true\n');
+    }
+    await saveFile(`_posts/${name}`, content, file.sha);
+    toast(isPinned ? '已取消置顶' : '✅ 已置顶');
+    // Refresh list
+    const items = await listDir('_posts');
+    state.posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
+    renderPosts();
+  } catch(e) { toast('操作失败: ' + e.message, 'error'); }
 }
 
 // ===================== GENERATE TAB =====================

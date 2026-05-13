@@ -16,6 +16,7 @@ a:hover { text-decoration: underline; }
 
 .post-grid { display: grid; gap: 20px; padding-bottom: 60px; }
 .post-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.2s; }
+.post-card.pinned { border-left: 3px solid #eab308; background: #fffef5; }
 .post-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
 .post-card h2 { font-size: 20px; margin: 8px 0; }
 .post-card h2 a { color: #111; }
