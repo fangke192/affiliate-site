@@ -17,18 +17,18 @@ OUTPUT_DIR = ROOT / "site" / "_posts"
 
 # ---------- 加载联盟推广链接 ----------
 AFFILIATE_FILE = ROOT / "config" / "affiliate_links.json"
-AFFILIATE_LINKS = {}
+AFFILIATE_LINKS = []
 if AFFILIATE_FILE.exists():
     try:
         with open(AFFILIATE_FILE, "r", encoding="utf-8") as f:
-            AFFILIATE_LINKS = json.load(f).get("products", {})
+            AFFILIATE_LINKS = json.load(f).get("products", [])
         print(f"  [推广] 已加载 {len(AFFILIATE_LINKS)} 个产品的推广链接")
     except Exception as e:
         print(f"  [推广] 加载失败: {e}")
 
 def get_affiliate_url(product_name):
     """获取产品的推广链接，多条时随机选一条，没有则返回空字符串"""
-    products = AFFILIATE_LINKS.get("products", [])
+    products = AFFILIATE_LINKS
     if not isinstance(products, list):
         return ""
     for p in products:
