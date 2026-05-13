@@ -1,0 +1,15 @@
+title: 工具推荐站
+description: 精选实用工具评测与推荐
+url: "https://fangke192.github.io"
+baseurl: "/affiliate-site"
+theme: jekyll-theme-cayman
+markdown: kramdown
+permalink: /:categories/:title/
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+exclude:
+  - README.md
+  - config.yaml
+  - scripts/
+  - .github/
