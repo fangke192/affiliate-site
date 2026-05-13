@@ -13,7 +13,7 @@ from string import Template
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "scripts" / "templates"
-OUTPUT_DIR = ROOT / "site" / "_posts"
+OUTPUT_DIR = ROOT / "_posts"
 
 # ---------- 产品数据 ----------
 # 品类列表，每类包含多个产品

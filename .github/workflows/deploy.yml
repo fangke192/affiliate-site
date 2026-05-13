@@ -25,8 +25,8 @@ jobs:
 
       - name: Commit new posts
         run: |
-          git config user.name "Bounty Bot"
+          git config user.name "Deploy Bot"
           git config user.email "bot@users.noreply.github.com"
-          git add site/_posts/
+          git add _posts/
           git diff --cached --quiet || git commit -m "auto: generate new posts"
           git push
