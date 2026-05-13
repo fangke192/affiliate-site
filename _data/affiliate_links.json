@@ -1,0 +1,49 @@
+{
+  "products": [
+    {
+      "name": "百度网盘",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "Notion",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "Obsidian",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "飞书文档",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "DeepSeek",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "Claude",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "ChatGPT",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "Google Drive",
+      "note": "",
+      "urls": []
+    },
+    {
+      "name": "Dropbox",
+      "note": "",
+      "urls": []
+    }
+  ]
+}
