@@ -127,20 +127,43 @@ OUTRO_TEMPLATES = [
     "工具只是手段，效率才是目的。选一个顺手的{category}就开始行动吧！如果你有其他推荐，欢迎在评论区分享。",
 ]
 
-CLOSING = """
+CLOSING_SIMPLE = """
+
+---
+
+*本文发布于 {date}，内容仅为个人体验，仅供参考。*
+"""
+
+
+def build_closing(date_str):
+    """如果配置了推广链接，生成推广结尾；否则只返回简单声明"""
+    valid_products = [p for p in AFFILIATE_LINKS if p.get("name") and p.get("urls")]
+    if not valid_products:
+        return CLOSING_SIMPLE.format(date=date_str)
+
+    pick = random.choice(valid_products)
+    name = pick["name"]
+    urls = pick["urls"]
+    note = pick.get("note", "")
+    url = random.choice(urls)
+
+    closing = f"""
+
 ---
 
 ## 💰 省钱推荐
 
-如果你需要云存储空间，推荐使用 **百度网盘**（国内访问快，2TB 免费空间）。
-通过下方链接注册，你还能获得额外福利👇
+"""
+    if note:
+        closing += f"{note}\n\n"
+    closing += f"""通过下方链接前往 **{name}** 官网，享受专属优惠（本站可能有少量推广佣金，不影响你的购买价格）。
 
-[👉 免费领取百度网盘福利](https://pan.baidu.com/)
+[👉 前往 {name} 官网]({url})
 
 ---
 
-*本文发布于 {date}，内容仅为个人体验，仅供参考。部分链接可能包含推广链接，但不影响你的购买价格。*
-"""
+{CLOSING_SIMPLE.format(date=date_str)}"""
+    return closing
 
 
 def pick_random(items):
@@ -216,7 +239,7 @@ def generate_post(category_name, category_data, products):
     outro = pick_random(OUTRO_TEMPLATES).format(category=category_name)
 
     # 完整正文
-    body = f"{intro}\n\n{comparison}\n" + "\n---\n".join(sections) + f"\n\n{outro}\n\n{CLOSING.format(date=datetime.now().strftime('%Y-%m-%d'))}"
+    body = f"{intro}\n\n{comparison}\n" + "\n---\n".join(sections) + f"\n\n{outro}\n\n{build_closing(datetime.now().strftime('%Y-%m-%d'))}"
 
     # SEO meta
     slug = f"{datetime.now().strftime('%Y-%m-%d')}-{slugify(category_data['slug'])}-review"
