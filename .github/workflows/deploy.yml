@@ -23,10 +23,12 @@ jobs:
       - name: Generate posts
         run: python scripts/generate_posts.py
 
-      - name: Commit new posts
+      - name: Copy posts to root and commit
         run: |
+          cp -r site/_posts/ _posts/ 2>/dev/null || true
           git config user.name "Deploy Bot"
           git config user.email "bot@users.noreply.github.com"
           git add _posts/
+          git add site/_posts/
           git diff --cached --quiet || git commit -m "auto: generate new posts"
           git push

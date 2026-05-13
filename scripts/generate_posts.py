@@ -13,7 +13,7 @@ from string import Template
 
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "scripts" / "templates"
-OUTPUT_DIR = ROOT / "_posts"
+OUTPUT_DIR = ROOT / "site" / "_posts"
 
 # ---------- 加载联盟推广链接 ----------
 AFFILIATE_FILE = ROOT / "config" / "affiliate_links.json"
