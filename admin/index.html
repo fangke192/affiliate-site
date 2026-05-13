@@ -538,8 +538,10 @@ async function saveAds() {
     const f = await getFile('_data/ads.yml');
     await saveFile('_data/ads.yml', yml, f ? f.sha : null);
     state.adsData = yml;
-    toast('✅ 广告配置已保存，下次构建后生效');
-    status.textContent = '✅ 已保存'; status.style.color = '#16a34a';
+    toast('✅ 广告配置已保存，触发构建中...');
+    status.textContent = '✅ 已保存，触发构建中...'; status.style.color = '#16a34a';
+    rebuildToast('触发网站重构建中，约 1-2 分钟后生效...');
+    triggerPagesBuild().catch(() => {});
   } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
   btn.disabled = false;
 }
