@@ -30,15 +30,19 @@ layout: default
   </nav>
 </article>
 
-{% comment %}推广链接：从已配置的产品中随机选一个展示{% endcomment %}
-{% assign prods = site.data.affiliate_links.products | where_exp: "p", "p.urls.size > 0" %}
-{% if prods.size > 0 %}
-{% assign pick = prods | sample %}
-{% assign url = pick.urls | sample %}
+{% comment %}推广链接：根据文章的 promotion 字段展示对应产品推广{% endcomment %}
+{% if page.promotion and page.promotion != "" %}
+{% assign promo_products = site.data.affiliate_links.products | where: "name", page.promotion %}
+{% assign promo_product = promo_products | first %}
+{% if promo_product.urls.size > 0 %}
+{% assign promo_url = promo_product.urls | sample %}
 <div class="affiliate-box">
-  <div class="affiliate-box-title">💡 推荐产品</div>
-  <p class="affiliate-box-name">{{ pick.name }}</p>
-  <p class="affiliate-box-desc">{{ pick.note }}</p>
-  <a href="{{ url }}" class="affiliate-box-btn" target="_blank" rel="nofollow noopener">前往官网 →</a>
+  <div class="affiliate-box-title">💡 赞助推广</div>
+  <p class="affiliate-box-name">{{ promo_product.name }}</p>
+  {% if promo_product.note and promo_product.note != "" %}
+  <p class="affiliate-box-desc">{{ promo_product.note }}</p>
+  {% endif %}
+  <a href="{{ promo_url }}" class="affiliate-box-btn" target="_blank" rel="nofollow noopener">前往 {{ promo_product.name }} 官网 →</a>
 </div>
+{% endif %}
 {% endif %}
