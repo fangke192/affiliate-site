@@ -296,12 +296,20 @@ async function loadTabData() {
     try {
       const items = await listDir('_posts');
       let posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
-      // 并行读取每篇文章的 front matter 获取置顶状态
+      // 并行读取每篇文章的 front matter 获取置顶状态和分类
       await Promise.all(posts.map(async (p) => {
         try {
           const file = await getFile(`_posts/${p.name}`);
-          p.pinned = file ? /^pinned:\s*true/m.test(file.content) : false;
-        } catch(e) { p.pinned = false; }
+          if (file) {
+            p.pinned = /^pinned:\s*true/m.test(file.content);
+            // 提取分类: categories: [xxx] 或 categories: xxx
+            const catMatch = file.content.match(/^categories:\s*\[?([^\}\]\n]+)/m);
+            p.category = catMatch ? catMatch[1].trim().replace(/[\[\]'"]/g, '').split(',')[0].trim() : '';
+          } else {
+            p.pinned = false;
+            p.category = '';
+          }
+        } catch(e) { p.pinned = false; p.category = ''; }
       }));
       state.posts = posts;
     } catch(e) {
@@ -621,11 +629,11 @@ function renderPosts() {
     html += `<div class="post-item">
       <div class="post-info">
         <div class="post-title">${escapeHtml(titlePart)} ${p.pinned ? '<span style="color:#eab308;font-size:12px;">📌</span>' : ''}</div>
-        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB</div>
+        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB${p.category ? ' · ' + p.category : ''}</div>
       </div>
       <div class="post-actions">
         <button class="btn ${pinBtnClass} btn-xs" onclick="togglePin('${p.name}')">${pinText}</button>
-        <a href="https://${OWNER}.github.io/${REPO}/${name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-manual$/, '')}/" target="_blank" class="btn btn-outline btn-xs">查看</a>
+        <a href="https://${OWNER}.github.io/${REPO}/${p.category ? p.category + '/' : ''}${name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-manual$/, '')}/" target="_blank" class="btn btn-outline btn-xs">查看</a>
         <button class="btn btn-danger btn-xs" onclick="deletePost('${p.name}','${p.sha}')">删除</button>
       </div>
     </div>`;
