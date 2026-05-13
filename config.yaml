@@ -1,0 +1,20 @@
+# 站点配置
+site:
+  title: "工具推荐站"
+  description: "精选实用工具评测与推荐"
+  url: "https://fangke192.github.io/affiliate-site"
+  baseurl: "/affiliate-site"
+
+# 文章生成配置
+content:
+  # 每轮生成文章数
+  posts_per_run: 3
+  # 运行间隔（小时）
+  run_interval_hours: 168  # 每周一次
+
+# 联盟链接（替换成你的）
+affiliate:
+  # 示例链接，需要你注册后替换
+  amazon_tag: "your-tag-20"
+  # 格式: { "产品名": "https://..." }
+  links: {}
