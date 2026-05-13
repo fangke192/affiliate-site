@@ -22,6 +22,20 @@
     {{ content }}
   </main>
 
+  <!-- 广告位：文章底部（多条广告中随机选一条） -->
+  {% if site.data.ads.enabled and site.data.ads.post_bottom.size > 0 and page.layout == "post" %}
+  <div class="ad-container">
+    {{ site.data.ads.post_bottom | sample }}
+  </div>
+  {% endif %}
+
+  <!-- 广告位：首页底部 -->
+  {% if site.data.ads.enabled and site.data.ads.home_bottom.size > 0 and page.layout == "default" %}
+  <div class="ad-container">
+    {{ site.data.ads.home_bottom | sample }}
+  </div>
+  {% endif %}
+
   <footer class="site-footer">
     <div class="container">
       <p>{{ site.title }} &copy; {{ 'now' | date: "%Y" }}</p>

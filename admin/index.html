@@ -10,8 +10,8 @@ layout: null
 <title>管理后台 - 工具推荐站</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; color: #333; font-size: 14px; }
-.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; color: #333; font-size: 14px; line-height: 1.6; }
+.container { max-width: 960px; margin: 0 auto; padding: 20px; }
 
 /* Login */
 .login-screen { max-width: 400px; margin: 100px auto; background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
@@ -20,56 +20,75 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .login-screen label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
 .login-screen input { width: 100%; padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; margin-bottom: 16px; }
 .login-screen input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
-.btn { display: inline-block; padding: 10px 24px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
-.btn-primary { background: #2563eb; color: #fff; width: 100%; }
+.btn { display: inline-flex; align-items: center; gap: 4px; padding: 8px 20px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+.btn-primary { background: #2563eb; color: #fff; }
 .btn-primary:hover { background: #1d4ed8; }
 .btn-primary:disabled { background: #93b4f5; cursor: not-allowed; }
 .btn-danger { background: #ef4444; color: #fff; }
 .btn-danger:hover { background: #dc2626; }
 .btn-outline { background: #fff; color: #333; border: 1px solid #d9d9d9; }
 .btn-outline:hover { border-color: #2563eb; color: #2563eb; }
-.btn-sm { padding: 6px 16px; font-size: 13px; }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+.btn-xs { padding: 2px 8px; font-size: 11px; border-radius: 4px; }
+.btn-green { background: #16a34a; color: #fff; }
+.btn-green:hover { background: #15803d; }
+.btn-full { width: 100%; justify-content: center; }
 .error { color: #ef4444; font-size: 13px; margin-top: 8px; }
 .success { color: #16a34a; font-size: 13px; margin-top: 8px; }
 
 /* Header */
 .header { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 12px 0; margin-bottom: 24px; }
-.header .container { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+.header .container { display: flex; justify-content: space-between; align-items: center; }
 .header h1 { font-size: 18px; }
 .header .user-info { color: #888; font-size: 12px; }
 .header .logout { color: #ef4444; cursor: pointer; margin-left: 12px; font-size: 13px; }
 
 /* Tabs */
-.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #fff; border-radius: 10px; padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.tab { flex: 1; padding: 10px; text-align: center; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 14px; color: #666; transition: all 0.2s; }
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #fff; border-radius: 10px; padding: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-wrap: wrap; }
+.tab { flex: 1; min-width: 80px; padding: 10px 6px; text-align: center; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 13px; color: #666; transition: all 0.2s; white-space: nowrap; }
 .tab:hover { background: #f3f4f6; }
 .tab.active { background: #2563eb; color: #fff; font-weight: 500; }
 
-/* Cards */
+/* Card */
 .card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .card h2 { font-size: 16px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
 .card label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
 .card .hint { color: #888; font-size: 12px; margin-bottom: 8px; }
-.card input, .card textarea, .card select { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; margin-bottom: 12px; }
+.card input, .card textarea, .card select { width: 100%; padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 14px; margin-bottom: 8px; }
 .card input:focus, .card textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 .card textarea { min-height: 60px; resize: vertical; font-family: monospace; font-size: 13px; }
 .save-status { display: inline-block; margin-left: 12px; font-size: 13px; }
 
-/* Spinner */
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear; margin-right: 6px; vertical-align: middle; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* Product/Ad items */
+.item-box { background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #e5e7eb; }
+.item-box h4 { font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.url-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+.url-row input { flex: 1; margin-bottom: 0; }
+.url-row .btn { flex-shrink: 0; }
+.add-url { margin-top: 4px; }
 
-/* Responsive */
+/* Post list */
+.post-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.post-item:last-child { border-bottom: none; }
+.post-item .post-info { flex: 1; }
+.post-item .post-title { font-weight: 600; font-size: 14px; }
+.post-item .post-meta { color: #888; font-size: 12px; margin-top: 2px; }
+.post-item .post-actions { flex-shrink: 0; display: flex; gap: 6px; }
+
+/* Toast */
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 24px; border-radius: 8px; color: #fff; font-size: 14px; z-index: 999; animation: fadeIn 0.3s; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+.toast.success { background: #16a34a; }
+.toast.error { background: #ef4444; }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; } }
+
 @media (max-width: 600px) {
   .container { padding: 12px; }
   .card { padding: 16px; }
-  .tabs { flex-wrap: wrap; }
-  .tab { flex: 1 1 45%; font-size: 13px; }
+  .tab { font-size: 12px; padding: 8px 4px; min-width: 60px; }
 }
 </style>
 </head>
 <body>
-
 <div id="app"></div>
 
 <script>
@@ -83,12 +102,42 @@ let state = {
   user: null,
   tab: 'affiliate',
   affiliateData: null,
-  adsYml: '',
-  saving: false,
-  message: '',
+  adsData: null,
+  posts: [],
   loading: false,
-  workflowRunning: false,
 };
+
+// ---------- Helpers ----------
+function btoaUTF8(str) {
+  const bytes = new TextEncoder().encode(str);
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  let out = '';
+  for (let i = 0; i < bytes.length; i += 3) {
+    const b1 = bytes[i], b2 = bytes[i+1] || 0, b3 = bytes[i+2] || 0;
+    out += chars[b1 >> 2] + chars[((b1 & 3) << 4) | (b2 >> 4)] + chars[((b2 & 15) << 2) | (b3 >> 6)] + chars[b3 & 63];
+  }
+  if (bytes.length % 3 === 1) out = out.slice(0, -2) + '==';
+  else if (bytes.length % 3 === 2) out = out.slice(0, -1) + '=';
+  return out;
+}
+
+function atobUTF8(str) {
+  const bytes = Uint8Array.from(atob(str.replace(/\n/g, '')), c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2500);
+}
 
 // ---------- GitHub API ----------
 async function gh(method, path, body) {
@@ -102,7 +151,8 @@ async function gh(method, path, body) {
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  const data = r.headers.get('content-type')?.includes('json') ? await r.json() : await r.text();
+  const ct = r.headers.get('content-type') || '';
+  const data = ct.includes('json') ? await r.json() : await r.text();
   if (!r.ok) throw new Error(typeof data === 'object' ? (data.message || r.statusText) : `HTTP ${r.status}`);
   return { status: r.status, data };
 }
@@ -110,10 +160,7 @@ async function gh(method, path, body) {
 async function getFile(path) {
   try {
     const { data } = await gh('GET', `/repos/${OWNER}/${REPO}/contents/${path}`);
-    return {
-      content: atob(data.content.replace(/\n/g, '')),
-      sha: data.sha,
-    };
+    return { content: atobUTF8(data.content), sha: data.sha };
   } catch (e) {
     if (e.message.includes('Not Found') || e.message.includes('404')) return null;
     throw e;
@@ -123,25 +170,24 @@ async function getFile(path) {
 async function saveFile(path, content, sha) {
   const body = {
     message: `admin: update ${path}`,
-    content: btoa(unescape(encodeURIComponent(content))),
+    content: btoaUTF8(content),
     branch: BRANCH,
   };
   if (sha) body.sha = sha;
-  const { data } = await gh('PUT', `/repos/${OWNER}/${REPO}/contents/${path}`, body);
-  return data.content.sha;
+  await gh('PUT', `/repos/${OWNER}/${REPO}/contents/${path}`, body);
 }
 
-function btoa(str) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-  let output = '';
-  const bytes = new TextEncoder().encode(str);
-  for (let i = 0; i < bytes.length; i += 3) {
-    const b1 = bytes[i], b2 = bytes[i+1] || 0, b3 = bytes[i+2] || 0;
-    output += chars[b1 >> 2] + chars[((b1 & 3) << 4) | (b2 >> 4)] + chars[((b2 & 15) << 2) | (b3 >> 6)] + chars[b3 & 63];
-  }
-  if (bytes.length % 3 === 1) output = output.slice(0, -2) + '==';
-  else if (bytes.length % 3 === 2) output = output.slice(0, -1) + '=';
-  return output;
+async function deleteFile(path, sha) {
+  await gh('DELETE', `/repos/${OWNER}/${REPO}/contents/${path}`, {
+    message: `admin: delete ${path}`,
+    sha,
+    branch: BRANCH,
+  });
+}
+
+async function listDir(path) {
+  const { data } = await gh('GET', `/repos/${OWNER}/${REPO}/contents/${path}`);
+  return data;
 }
 
 // ---------- Render ----------
@@ -161,20 +207,18 @@ function render() {
     </div>
     <div class="container">
       <div class="tabs">
-        <button class="tab ${state.tab === 'affiliate' ? 'active' : ''}" onclick="switchTab('affiliate')">🔗 推广链接</button>
-        <button class="tab ${state.tab === 'ads' ? 'active' : ''}" onclick="switchTab('ads')">📢 广告代码</button>
-        <button class="tab ${state.tab === 'generate' ? 'active' : ''}" onclick="switchTab('generate')">⚡ 生成文章</button>
+        <button class="tab ${state.tab==='affiliate'?'active':''}" onclick="switchTab('affiliate')">🔗 推广</button>
+        <button class="tab ${state.tab==='ads'?'active':''}" onclick="switchTab('ads')">📢 广告</button>
+        <button class="tab ${state.tab==='write'?'active':''}" onclick="switchTab('write')">✍️ 写文章</button>
+        <button class="tab ${state.tab==='posts'?'active':''}" onclick="switchTab('posts')">📋 文章</button>
+        <button class="tab ${state.tab==='generate'?'active':''}" onclick="switchTab('generate')">⚡ 生成</button>
       </div>
       <div id="tab-content">${state.loading ? '<div class="card" style="text-align:center;padding:60px;"><div class="spinner"></div> 加载中...</div>' : ''}</div>
     </div>
   `;
   if (!state.loading) {
-    if (state.tab === 'affiliate') renderAffiliate();
-    else if (state.tab === 'ads') renderAds();
-    else if (state.tab === 'generate') renderGenerate();
-  }
-  if (state.message) {
-    setTimeout(() => { state.message = ''; render(); }, 3000);
+    const fns = { affiliate: renderAffiliate, ads: renderAds, write: renderWrite, posts: renderPosts, generate: renderGenerate };
+    (fns[state.tab] || renderAffiliate)();
   }
 }
 
@@ -182,208 +226,414 @@ function renderLogin() {
   document.getElementById('app').innerHTML = `
     <div class="login-screen">
       <h1>🔐 管理后台</h1>
-      <p>输入你的 GitHub Token 登录管理后台<br>Token 仅保存在当前浏览器会话中</p>
+      <p>输入 GitHub Token 登录<br>Token 仅保存在当前浏览器会话</p>
       <label>GitHub Personal Access Token</label>
       <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx" onkeydown="if(event.key==='Enter')login()">
-      <button class="btn btn-primary" id="login-btn" onclick="login()">登录</button>
+      <button class="btn btn-primary btn-full" id="login-btn" onclick="login()">登录</button>
       <div id="login-error" class="error"></div>
     </div>
   `;
   document.getElementById('token-input').focus();
 }
 
-// ---------- Actions ----------
 async function login() {
   const input = document.getElementById('token-input');
   const btn = document.getElementById('login-btn');
   const err = document.getElementById('login-error');
   state.token = input.value.trim();
   if (!state.token) { err.textContent = '请输入 Token'; return; }
-  btn.disabled = true;
-  btn.textContent = '验证中...';
+  btn.disabled = true; btn.textContent = '验证中...';
   try {
     const { data } = await gh('GET', '/user');
     state.user = data.login;
-    state.loading = true;
-    render();
-    await loadData();
-    state.loading = false;
-    render();
+    sessionStorage.setItem('admin_token', state.token);
+    state.loading = true; render();
+    await loadTabData();
+    state.loading = false; render();
   } catch (e) {
     err.textContent = '验证失败: ' + e.message;
     state.token = '';
-    btn.disabled = false;
-    btn.textContent = '登录';
+    btn.disabled = false; btn.textContent = '登录';
   }
 }
 
 function logout() {
-  state = { token: '', user: null, tab: 'affiliate', affiliateData: null, adsYml: '', saving: false, message: '', loading: false, workflowRunning: false };
+  sessionStorage.removeItem('admin_token');
+  state = { token: '', user: null, tab: 'affiliate', affiliateData: null, adsData: null, posts: [], loading: false };
   render();
 }
 
 function switchTab(tab) {
   state.tab = tab;
-  state.loading = true;
-  render();
-  loadData().then(() => { state.loading = false; render(); });
+  state.loading = true; render();
+  loadTabData().then(() => { state.loading = false; render(); });
 }
 
-async function loadData() {
+async function loadTabData() {
   if (state.tab === 'affiliate') {
-    const file = await getFile('config/affiliate_links.json');
-    state.affiliateData = file ? JSON.parse(file.content) : null;
+    const f = await getFile('config/affiliate_links.json');
+    if (f) {
+      try { state.affiliateData = JSON.parse(f.content); } catch(e) { state.affiliateData = null; }
+    } else {
+      state.affiliateData = { products: [] };
+    }
   } else if (state.tab === 'ads') {
-    const file = await getFile('_data/ads.yml');
-    state.adsYml = file ? file.content : '# 广告配置\nenabled: false\npost_bottom: ""\nhome_bottom: ""\nsidebar: ""';
+    const f = await getFile('_data/ads.yml');
+    state.adsData = f ? f.content : '';
+  } else if (state.tab === 'posts') {
+    try {
+      const items = await listDir('_posts');
+      state.posts = items.filter(i => i.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
+    } catch(e) {
+      state.posts = [];
+    }
   }
 }
 
-// ---------- Affiliate Tab ----------
+// ===================== AFFILIATE TAB =====================
 function renderAffiliate() {
-  const content = document.getElementById('tab-content');
-  if (!state.affiliateData) {
-    content.innerHTML = '<div class="card" style="text-align:center;padding:60px;color:#888;">无法加载推广链接配置</div>';
-    return;
+  const el = document.getElementById('tab-content');
+  if (!state.affiliateData || !Array.isArray(state.affiliateData.products)) {
+    state.affiliateData = { products: [] };
   }
-  const products = state.affiliateData.products || {};
-  let html = '<div class="card"><h2>🔗 推广链接管理</h2><p class="hint">填写各产品的推广链接后保存，下次生成的文章会自动带上</p>';
-  for (const [name, info] of Object.entries(products)) {
-    const note = info._note || '';
-    const url = info.url || '';
-    html += `
-      <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #eee;">
-        <label>${name}</label>
-        <input type="url" id="aff-${name}" value="${escapeHtml(url)}" placeholder="https://..." onchange="markDirty()">
-        <div class="hint">${escapeHtml(note)}</div>
-      </div>
-    `;
-  }
-  html += `
-    <div style="margin-top:16px;">
-      <button class="btn btn-primary" onclick="saveAffiliate()" id="aff-save-btn">💾 保存推广链接</button>
+  const products = state.affiliateData.products;
+  let html = `<div class="card">
+    <h2>🔗 推广链接管理</h2>
+    <p class="hint">每个产品可以添加多条推广链接，生成文章时会随机选一条。<br>如果链接列表为空，该产品不显示推广信息。</p>
+    <div id="aff-list">`;
+  products.forEach((p, i) => {
+    html += renderProductItem(p, i);
+  });
+  html += `</div>
+    <button class="btn btn-outline btn-sm" onclick="addProduct()" style="margin-top:8px;">+ 添加产品</button>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid #eee;">
+      <button class="btn btn-primary" onclick="saveAffiliate()" id="aff-save-btn">💾 保存全部</button>
       <span id="aff-status" class="save-status"></span>
     </div>
   </div>`;
-  content.innerHTML = html;
+  el.innerHTML = html;
 }
 
-function markDirty() {
-  document.getElementById('aff-status').textContent = '⚠️ 未保存';
-  document.getElementById('aff-status').style.color = '#d97706';
+function renderProductItem(p, i) {
+  const urls = Array.isArray(p.urls) ? p.urls : [];
+  let urlHtml = urls.map((u, j) => `
+    <div class="url-row">
+      <input type="url" value="${escapeHtml(u)}" placeholder="https://..." onchange="updateProductUrl(${i},${j},this.value)">
+      <button class="btn btn-danger btn-xs" onclick="removeProductUrl(${i},${j})">✕</button>
+    </div>
+  `).join('');
+  return `<div class="item-box" data-idx="${i}">
+    <h4>
+      <input value="${escapeHtml(p.name)}" placeholder="产品名称" onchange="updateProductField(${i},'name',this.value)" style="font-weight:600;font-size:14px;border:none;background:transparent;width:auto;margin:0;padding:0;">
+      <button class="btn btn-danger btn-xs" onclick="removeProduct(${i})">删除</button>
+    </h4>
+    <label style="margin-top:4px;">备注（仅管理后台可见）</label>
+    <input value="${escapeHtml(p.note || '')}" placeholder="备注信息" onchange="updateProductField(${i},'note',this.value)">
+    <label>推广链接（可添加多条）</label>
+    ${urlHtml}
+    <button class="btn btn-outline btn-xs add-url" onclick="addProductUrl(${i})">+ 添加链接</button>
+  </div>`;
+}
+
+function updateProductField(i, field, val) {
+  state.affiliateData.products[i][field] = val;
+  markAffDirty();
+}
+
+function updateProductUrl(pi, ui, val) {
+  state.affiliateData.products[pi].urls[ui] = val;
+  markAffDirty();
+}
+
+function addProductUrl(i) {
+  if (!state.affiliateData.products[i].urls) state.affiliateData.products[i].urls = [];
+  state.affiliateData.products[i].urls.push('');
+  renderAffiliate();
+  markAffDirty();
+}
+
+function removeProductUrl(pi, ui) {
+  state.affiliateData.products[pi].urls.splice(ui, 1);
+  renderAffiliate();
+  markAffDirty();
+}
+
+function addProduct() {
+  state.affiliateData.products.push({ name: '新产品', note: '', urls: [''] });
+  renderAffiliate();
+  markAffDirty();
+}
+
+function removeProduct(i) {
+  if (!confirm(`确定删除产品「${state.affiliateData.products[i].name}」？`)) return;
+  state.affiliateData.products.splice(i, 1);
+  renderAffiliate();
+  markAffDirty();
+}
+
+function markAffDirty() {
+  const s = document.getElementById('aff-status');
+  if (s) { s.textContent = '⚠️ 未保存'; s.style.color = '#d97706'; }
 }
 
 async function saveAffiliate() {
   const btn = document.getElementById('aff-save-btn');
   const status = document.getElementById('aff-status');
-  btn.disabled = true;
-  status.innerHTML = '<span class="spinner"></span> 保存中...';
+  btn.disabled = true; status.innerHTML = '<span class="spinner"></span> 保存中...';
   try {
-    const products = state.affiliateData.products || {};
-    for (const name of Object.keys(products)) {
-      products[name].url = document.getElementById(`aff-${name}`).value.trim();
-    }
+    // Clean up empty names and empty urls
+    state.affiliateData.products = state.affiliateData.products.filter(p => p.name.trim());
+    state.affiliateData.products.forEach(p => {
+      p.urls = (p.urls || []).filter(u => u.trim());
+      p.name = p.name.trim();
+    });
     const content = JSON.stringify(state.affiliateData, null, 2);
-    const file = await getFile('config/affiliate_links.json');
-    await saveFile('config/affiliate_links.json', content, file ? file.sha : null);
-    state.affiliateData = JSON.parse(content);
-    status.textContent = '✅ 保存成功！';
-    status.style.color = '#16a34a';
-  } catch (e) {
-    status.textContent = '❌ 保存失败: ' + e.message;
-    status.style.color = '#ef4444';
-  }
+    const f = await getFile('config/affiliate_links.json');
+    await saveFile('config/affiliate_links.json', content, f ? f.sha : null);
+    toast('✅ 推广链接已保存');
+    status.textContent = '✅ 已保存'; status.style.color = '#16a34a';
+  } catch (e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
   btn.disabled = false;
 }
 
-// ---------- Ads Tab ----------
+// ===================== ADS TAB =====================
 function renderAds() {
-  const content = document.getElementById('tab-content');
-  const yml = state.adsYml;
-  // Parse simple YAML to pre-fill fields
-  const enabled = yml.match(/^enabled:\s*(true|false)/m)?.[1] === 'true';
-  const postBottom = yml.match(/^post_bottom:\s*"([^]*?)"$/m)?.[1] || yml.match(/^post_bottom:\s*'([^]*?)'$/m)?.[1] || '';
-  const homeBottom = yml.match(/^home_bottom:\s*"([^]*?)"$/m)?.[1] || '';
-  const sidebar = yml.match(/^sidebar:\s*"([^]*?)"$/m)?.[1] || '';
+  const el = document.getElementById('tab-content');
+  // Parse YAML to extract data
+  const yml = state.adsData || '';
+  const enabled = /^enabled:\s*(true)/m.test(yml);
+  const postBottom = extractYamlArray(yml, 'post_bottom');
+  const homeBottom = extractYamlArray(yml, 'home_bottom');
 
-  content.innerHTML = `
-    <div class="card">
-      <h2>📢 广告代码管理</h2>
-      <p class="hint">在此粘贴你的广告代码（支持百度联盟、Google AdSense 等任意广告代码）<br>
-      广告将在下次网站重新构建后生效（触发"生成文章"后自动构建）</p>
+  function extractYamlArray(y, key) {
+    const re = new RegExp(`^${key}:\\s*\\n((?:\\s+-\\s+['"].*?['"]\\n?)*)`, 'm');
+    const m = y.match(re);
+    if (m) {
+      return [...m[1].matchAll(/-\s+['"](.*?)['"]\s*$/gm)].map(x => x[1]);
+    }
+    // Single line format
+    const singleRe = new RegExp(`^${key}:\\s*\\[(.*?)\\]`, 'm');
+    const singleM = y.match(singleRe);
+    if (singleM && singleM[1].trim()) {
+      return singleM[1].split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
+    }
+    return [];
+  }
 
-      <div style="margin-bottom:16px;">
-        <label>启用广告</label>
-        <select id="ads-enabled">
-          <option value="false" ${!enabled ? 'selected' : ''}>关闭</option>
-          <option value="true" ${enabled ? 'selected' : ''}>开启</option>
-        </select>
-      </div>
+  function buildYaml(enabled, bottom, home) {
+    let y = '# 广告配置\n# 每个位置可以填多条广告代码，网站构建时会随机选一条展示\n';
+    y += `enabled: ${enabled}\n`;
+    y += `post_bottom:\n${bottom.map(c => `  - "${c.replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"`).join('\n')}\n`;
+    y += `home_bottom:\n${home.map(c => `  - "${c.replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"`).join('\n')}\n`;
+    y += 'sidebar: []\n';
+    return y;
+  }
 
-      <div style="margin-bottom:16px;">
-        <label>文章底部广告</label>
-        <div class="hint">展示在每篇文章的底部</div>
-        <textarea id="ads-post-bottom" rows="4" style="font-family:monospace;font-size:13px;">${escapeHtml(postBottom)}</textarea>
-      </div>
-
-      <div style="margin-bottom:16px;">
-        <label>首页底部广告</label>
-        <div class="hint">展示在首页文章列表下方</div>
-        <textarea id="ads-home-bottom" rows="4" style="font-family:monospace;font-size:13px;">${escapeHtml(homeBottom)}</textarea>
-      </div>
-
-      <div>
-        <button class="btn btn-primary" onclick="saveAds()" id="ads-save-btn">💾 保存广告配置</button>
-        <span id="ads-status" class="save-status"></span>
-      </div>
+  el.innerHTML = `<div class="card">
+    <h2>📢 广告管理</h2>
+    <p class="hint">每个位置可添加多条广告代码，网站构建时会随机选一条展示。<br>支持百度联盟、Google AdSense 等任意广告代码。</p>
+    <div style="margin-bottom:16px;">
+      <label>启用广告</label>
+      <select id="ads-enabled">
+        <option value="false" ${!enabled?'selected':''}>关闭</option>
+        <option value="true" ${enabled?'selected':''}>开启</option>
+      </select>
     </div>
-  `;
+    <div style="margin-bottom:16px;">
+      <label>文章底部广告</label><div class="hint">展示在每篇文章底部</div>
+      <div id="post-bottom-list">${renderAdCodes('postBottom', postBottom)}</div>
+      <button class="btn btn-outline btn-xs" onclick="addAdCode('postBottom')">+ 添加广告代码</button>
+    </div>
+    <div style="margin-bottom:16px;">
+      <label>首页底部广告</label><div class="hint">展示在首页底部</div>
+      <div id="home-bottom-list">${renderAdCodes('homeBottom', homeBottom)}</div>
+      <button class="btn btn-outline btn-xs" onclick="addAdCode('homeBottom')">+ 添加广告代码</button>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="saveAds()" id="ads-save-btn">💾 保存广告</button>
+      <span id="ads-status" class="save-status"></span>
+    </div>
+  </div>`;
+
+  function renderAdCodes(key, codes) {
+    if (!window._adCodes) window._adCodes = {};
+    window._adCodes[key] = codes;
+    return codes.map((c, i) => `
+      <div class="url-row" style="margin-bottom:6px;">
+        <textarea rows="2" style="font-family:monospace;font-size:12px;margin:0;flex:1;min-height:40px;" onchange="updateAdCode('${key}',${i},this.value)" placeholder="粘贴广告代码（HTML/JS）">${escapeHtml(c)}</textarea>
+        <button class="btn btn-danger btn-xs" onclick="removeAdCode('${key}',${i})">✕</button>
+      </div>
+    `).join('');
+  }
+}
+
+function updateAdCode(key, i, val) {
+  if (!window._adCodes) window._adCodes = {};
+  if (!window._adCodes[key]) window._adCodes[key] = [];
+  window._adCodes[key][i] = val;
+}
+
+function addAdCode(key) {
+  if (!window._adCodes) window._adCodes = {};
+  if (!window._adCodes[key]) window._adCodes[key] = [];
+  window._adCodes[key].push('');
+  renderAds();
+}
+
+function removeAdCode(key, i) {
+  if (!window._adCodes) window._adCodes = {};
+  if (window._adCodes[key]) window._adCodes[key].splice(i, 1);
+  renderAds();
 }
 
 async function saveAds() {
   const btn = document.getElementById('ads-save-btn');
   const status = document.getElementById('ads-status');
-  btn.disabled = true;
-  status.innerHTML = '<span class="spinner"></span> 保存中...';
+  btn.disabled = true; status.innerHTML = '<span class="spinner"></span> 保存中...';
   try {
     const enabled = document.getElementById('ads-enabled').value;
-    const postBottom = document.getElementById('ads-post-bottom').value;
-    const homeBottom = document.getElementById('ads-home-bottom').value;
-    // Build YAML
-    let yml = '# 广告配置\n';
-    yml += `enabled: ${enabled}\n`;
-    yml += `post_bottom: "${postBottom.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"\n`;
-    yml += `home_bottom: "${homeBottom.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"\n`;
-    yml += `sidebar: ""\n`;
+    const postBottom = (window._adCodes?.postBottom || []).filter(c => c.trim());
+    const homeBottom = (window._adCodes?.homeBottom || []).filter(c => c.trim());
 
-    const file = await getFile('_data/ads.yml');
-    await saveFile('_data/ads.yml', yml, file ? file.sha : null);
-    state.adsYml = yml;
-    status.textContent = '✅ 保存成功！网站下次构建后将生效';
-    status.style.color = '#16a34a';
-  } catch (e) {
-    status.textContent = '❌ 保存失败: ' + e.message;
-    status.style.color = '#ef4444';
-  }
+    let yml = '# 广告配置\n# 每个位置可以填多条广告代码，网站构建时会随机选一条展示\n';
+    yml += `enabled: ${enabled}\n`;
+    yml += `post_bottom:\n${postBottom.map(c => `  - "${c.replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"`).join('\n')}\n`;
+    yml += `home_bottom:\n${homeBottom.map(c => `  - "${c.replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"`).join('\n')}\n`;
+    yml += 'sidebar: []\n';
+
+    const f = await getFile('_data/ads.yml');
+    await saveFile('_data/ads.yml', yml, f ? f.sha : null);
+    state.adsData = yml;
+    toast('✅ 广告配置已保存，下次构建后生效');
+    status.textContent = '✅ 已保存'; status.style.color = '#16a34a';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
   btn.disabled = false;
 }
 
-// ---------- Generate Tab ----------
+// ===================== WRITE TAB =====================
+function renderWrite() {
+  const el = document.getElementById('tab-content');
+  const cats = ['笔记工具', 'AI 工具', '云存储', '其他'];
+  el.innerHTML = `<div class="card">
+    <h2>✍️ 手动写文章</h2>
+    <p class="hint">手动发布一篇文章，内容会保存到仓库的 _posts 目录，下次构建后展示在网站上。</p>
+    <div style="margin-bottom:12px;">
+      <label>文章标题</label>
+      <input id="post-title" placeholder="输入文章标题">
+    </div>
+    <div style="margin-bottom:12px;">
+      <label>分类</label>
+      <select id="post-category">
+        ${cats.map(c => `<option value="${c}">${c}</option>`).join('')}
+      </select>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label>文章正文（支持 Markdown 格式）</label>
+      <div class="hint">第一段会自动作为摘要</div>
+      <textarea id="post-body" rows="16" placeholder="在此输入文章内容...&#10;&#10;支持 Markdown 语法：# 标题、**粗体**、- 列表 等" style="min-height:300px;"></textarea>
+    </div>
+    <div>
+      <button class="btn btn-primary" onclick="publishPost()" id="pub-btn">📤 发布文章</button>
+      <span id="pub-status" class="save-status"></span>
+    </div>
+  </div>`;
+}
+
+async function publishPost() {
+  const title = document.getElementById('post-title').value.trim();
+  const cat = document.getElementById('post-category').value;
+  const body = document.getElementById('post-body').value.trim();
+  if (!title || !body) { toast('请填写标题和正文', 'error'); return; }
+
+  const btn = document.getElementById('pub-btn');
+  const status = document.getElementById('pub-status');
+  btn.disabled = true; status.innerHTML = '<span class="spinner"></span> 发布中...';
+
+  try {
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const timeStr = now.toTimeString().split(' ')[0] + ' +0800';
+    const slug = dateStr + '-' + title.toLowerCase().replace(/[^\w\u4e00-\u9fff]+/g, '-').replace(/^-|-$/g, '') + '-manual';
+    const excerpt = body.replace(/[#*`>\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150) + '...';
+    const catSlug = cat === '其他' ? 'general' : cat === '笔记工具' ? 'note-taking' : cat === 'AI 工具' ? 'ai-tools' : 'cloud-storage';
+
+    const frontMatter = `---
+layout: post
+title: "${title}"
+date: ${dateStr} ${timeStr}
+categories: [${catSlug}]
+excerpt: "${excerpt}"
+---
+
+${body}
+`;
+    const fileName = `${slug}.md`;
+    const f = await getFile(`_posts/${fileName}`);
+    await saveFile(`_posts/${fileName}`, frontMatter, f ? f.sha : null);
+    toast('✅ 文章已发布！触发构建后展示');
+    status.textContent = '✅ 发布成功！去"生成"页面触发构建';
+    status.style.color = '#16a34a';
+    document.getElementById('post-title').value = '';
+    document.getElementById('post-body').value = '';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
+  btn.disabled = false;
+}
+
+// ===================== POSTS TAB =====================
+function renderPosts() {
+  const el = document.getElementById('tab-content');
+  if (!state.posts.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;padding:60px;color:#888;">暂无文章</div>';
+    return;
+  }
+  let html = `<div class="card">
+    <h2>📋 文章管理 (${state.posts.length} 篇)</h2>
+    <div id="post-list">`;
+  state.posts.forEach(p => {
+    const name = p.name.replace(/\.md$/, '');
+    const datePart = name.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] || '';
+    const titlePart = name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-/g, ' ');
+    html += `<div class="post-item">
+      <div class="post-info">
+        <div class="post-title">${escapeHtml(titlePart)}</div>
+        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB · ${p.sha.slice(0,7)}</div>
+      </div>
+      <div class="post-actions">
+        <a href="https://${OWNER}.github.io/${REPO}/${name.replace(/^\d{4}-\d{2}-\d{2}-/, '').replace(/-manual$/, '')}/" target="_blank" class="btn btn-outline btn-xs">查看</a>
+        <button class="btn btn-danger btn-xs" onclick="deletePost('${p.name}','${p.sha}')">删除</button>
+      </div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  el.innerHTML = html;
+}
+
+async function deletePost(name, sha) {
+  if (!confirm(`确定删除文章「${name}」？此操作不可恢复！`)) return;
+  try {
+    await deleteFile(`_posts/${name}`, sha);
+    toast(`✅ 已删除 ${name}`);
+    state.posts = state.posts.filter(p => p.name !== name);
+    renderPosts();
+  } catch(e) { toast('删除失败: ' + e.message, 'error'); }
+}
+
+// ===================== GENERATE TAB =====================
 function renderGenerate() {
-  const content = document.getElementById('tab-content');
-  content.innerHTML = `
+  const el = document.getElementById('tab-content');
+  el.innerHTML = `
     <div class="card">
-      <h2>⚡ 手动生成文章</h2>
-      <p class="hint">点击按钮立即触发 GitHub Actions 工作流，生成新的 SEO 文章并部署到网站</p>
+      <h2>⚡ 自动生成文章</h2>
+      <p class="hint">触发 GitHub Actions 工作流，自动生成新的 SEO 文章并部署到网站</p>
       <div style="margin-bottom:16px;">
-        <button class="btn btn-primary" onclick="triggerWorkflow()" id="gen-btn" style="width:auto;">🚀 立即生成文章</button>
+        <button class="btn btn-primary" onclick="triggerWorkflow()" id="gen-btn">🚀 立即生成文章</button>
         <span id="gen-status" class="save-status"></span>
       </div>
-      <div style="background:#f9fafb;border-radius:8px;padding:16px;font-size:13px;color:#666;">
+      <div style="background:#f9fafb;border-radius:8px;padding:16px;font-size:13px;color:#666;margin-bottom:8px;">
         <strong>自动化说明：</strong><br>
         • 每周一 00:00 UTC 自动运行<br>
-        • 每次随机选取 3 个分类生成文章<br>
-        • 每篇文章包含功能对比、优缺点分析、推广链接<br>
+        • 每次随机选取 3 个分类生成对比评测文章<br>
+        • 文章自动带上你配置的推广链接<br>
         • 生成后自动部署到 GitHub Pages
       </div>
     </div>
@@ -391,63 +641,49 @@ function renderGenerate() {
       <h2>📋 快捷操作</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" class="btn btn-outline btn-sm">查看工作流运行记录</a>
-        <a href="https://github.com/${OWNER}/${REPO}/" target="_blank" class="btn btn-outline btn-sm">访问 GitHub 仓库</a>
+        <a href="https://github.com/${OWNER}/${REPO}/" target="_blank" class="btn btn-outline btn-sm">GitHub 仓库</a>
         <a href="https://${OWNER}.github.io/${REPO}/" target="_blank" class="btn btn-outline btn-sm">查看网站</a>
+        <button class="btn btn-outline btn-sm" onclick="triggerPagesBuild()">手动触发 Pages 构建</button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 async function triggerWorkflow() {
   const btn = document.getElementById('gen-btn');
   const status = document.getElementById('gen-status');
-  btn.disabled = true;
-  status.innerHTML = '<span class="spinner"></span> 触发中...';
+  btn.disabled = true; status.innerHTML = '<span class="spinner"></span> 触发中...';
   try {
     await gh('POST', `/repos/${OWNER}/${REPO}/actions/workflows/deploy.yml/dispatches`, { ref: BRANCH });
-    status.innerHTML = '✅ 已触发！等待 2-3 分钟后查看网站更新 <a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" style="color:#2563eb;">查看进度</a>';
-    status.style.color = '#16a34a';
-  } catch (e) {
-    status.textContent = '❌ 触发失败: ' + e.message;
-    status.style.color = '#ef4444';
-  }
+    toast('✅ 已触发文章生成！约 2-3 分钟后完成');
+    status.innerHTML = '✅ 已触发！<a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" style="color:#2563eb;">查看进度</a>';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
   btn.disabled = false;
 }
 
-// ---------- Utils ----------
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+async function triggerPagesBuild() {
+  const status = document.getElementById('gen-status');
+  status.innerHTML = '<span class="spinner"></span> 请求中...';
+  try {
+    await gh('POST', `/repos/${OWNER}/${REPO}/pages/builds`);
+    toast('✅ Pages 构建已触发');
+    status.textContent = '✅ 构建已触发';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
 }
 
-// ---------- Init ----------
-// Check if token saved in session
+// ===================== INIT =====================
 const savedToken = sessionStorage.getItem('admin_token');
 if (savedToken) {
   state.token = savedToken;
-  state.loading = true;
-  render();
+  state.loading = true; render();
   gh('GET', '/user').then(({ data }) => {
     state.user = data.login;
-    return loadData();
+    return loadTabData();
   }).then(() => {
-    state.loading = false;
-    render();
-  }).catch(() => {
-    state.token = '';
-    state.loading = false;
-    render();
-  });
+    state.loading = false; render();
+  }).catch(() => { state.token = ''; state.loading = false; render(); });
 } else {
   render();
 }
-
-// Save token to session on login
-const origLogin = login;
-login = async function() {
-  await origLogin.call(this);
-  if (state.token) sessionStorage.setItem('admin_token', state.token);
-};
 </script>
 </body>
 </html>

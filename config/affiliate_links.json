@@ -1,49 +1,49 @@
 {
-  "_说明": "在此文件中填写你的推广链接，留空则不插入推广链接",
-  "_百度网盘_任推邦": "https://www.rentuibang.com/ 注册后获取推广链接",
-  "_淘宝客_阿里妈妈": "https://pub.alimama.com/ 注册后获取商品推广链接",
-
-  "products": {
-    "Notion": {
-      "url": "",
-      "_note": "Notion 联盟需要 PayPal 收款，暂不支持"
+  "products": [
+    {
+      "name": "百度网盘",
+      "note": "注册任推邦(rentuibang.com)获取推广链接",
+      "urls": []
     },
-    "Obsidian": {
-      "url": "",
-      "_note": "Obsidian 无官方联盟计划"
+    {
+      "name": "Notion",
+      "note": "Notion 联盟需要 PayPal 收款，暂不支持",
+      "urls": []
     },
-    "飞书文档": {
-      "url": "",
-      "_note": "飞书无公开联盟计划"
+    {
+      "name": "Obsidian",
+      "note": "Obsidian 无官方联盟计划",
+      "urls": []
     },
-    "DeepSeek": {
-      "url": "",
-      "_note": "DeepSeek 无联盟计划"
+    {
+      "name": "飞书文档",
+      "note": "飞书无公开联盟计划",
+      "urls": []
     },
-    "Claude": {
-      "url": "",
-      "_note": "Claude 无联盟计划"
+    {
+      "name": "DeepSeek",
+      "note": "DeepSeek 无联盟计划",
+      "urls": []
     },
-    "ChatGPT": {
-      "url": "",
-      "_note": "OpenAI 联盟需要通过第三方平台，门槛较高"
+    {
+      "name": "Claude",
+      "note": "Claude 无联盟计划",
+      "urls": []
     },
-    "百度网盘": {
-      "url": "",
-      "_note": "百度网盘联盟：注册任推邦(rentuibang.com)获取推广链接"
+    {
+      "name": "ChatGPT",
+      "note": "OpenAI 联盟需通过第三方平台",
+      "urls": []
     },
-    "Google Drive": {
-      "url": "",
-      "_note": "Google Drive 无公开联盟计划"
+    {
+      "name": "Google Drive",
+      "note": "Google Drive 无公开联盟计划",
+      "urls": []
     },
-    "Dropbox": {
-      "url": "",
-      "_note": "Dropbox 推荐计划只赠送存储空间，不返现"
+    {
+      "name": "Dropbox",
+      "note": "Dropbox 推荐计划只赠送存储空间",
+      "urls": []
     }
-  },
-
-  "通用推广": {
-    "_淘宝_办公用品": "https://s.click.taobao.com/...",
-    "_京东_数码产品": "https://union.jd.com/..."
-  }
+  ]
 }

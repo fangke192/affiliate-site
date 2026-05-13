@@ -27,10 +27,16 @@ if AFFILIATE_FILE.exists():
         print(f"  [推广] 加载失败: {e}")
 
 def get_affiliate_url(product_name):
-    """获取产品的推广链接，没有则返回空字符串"""
-    info = AFFILIATE_LINKS.get(product_name, {})
-    if isinstance(info, dict):
-        return info.get("url", "")
+    """获取产品的推广链接，多条时随机选一条，没有则返回空字符串"""
+    products = AFFILIATE_LINKS.get("products", [])
+    if not isinstance(products, list):
+        return ""
+    for p in products:
+        if p.get("name") == product_name:
+            urls = p.get("urls", [])
+            if not urls:
+                return ""
+            return random.choice(urls)
     return ""
 
 # ---------- 产品数据 ----------
