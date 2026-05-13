@@ -190,10 +190,35 @@ async function saveFile(path, content, sha) {
 }
 
 async function deleteFile(path, sha) {
-  await gh('DELETE', `/repos/${OWNER}/${REPO}/contents/${path}`, {
+  // 使用 Git Data API（POST/PATCH）替代 Contents API DELETE，避免浏览器 CORS 问题
+  const branch = BRANCH;
+  // 1. 获取分支最新 ref
+  const ref = await gh('GET', `/repos/${OWNER}/${REPO}/git/refs/heads/${branch}`);
+  const latestCommitSha = ref.data.object.sha;
+  // 2. 获取当前 commit 的 tree
+  const commit = await gh('GET', `/repos/${OWNER}/${REPO}/git/commits/${latestCommitSha}`);
+  const treeSha = commit.data.tree.sha;
+  // 3. 获取完整 tree
+  const tree = await gh('GET', `/repos/${OWNER}/${REPO}/git/trees/${treeSha}?recursive=1`);
+  // 4. 过滤掉要删除的文件
+  const filteredEntries = tree.data.tree.filter(entry => entry.path !== path);
+  // 5. 创建新 tree（不含该文件）
+  const newTree = await gh('POST', `/repos/${OWNER}/${REPO}/git/trees`, {
+    base_tree: treeSha,
+    tree: filteredEntries.map(e => ({ path: e.path, mode: e.mode, type: e.type, sha: e.sha }))
+  });
+  const newTreeSha = newTree.data.sha;
+  // 6. 创建新 commit
+  const newCommit = await gh('POST', `/repos/${OWNER}/${REPO}/git/commits`, {
     message: `admin: delete ${path}`,
-    sha,
-    branch: BRANCH,
+    tree: newTreeSha,
+    parents: [latestCommitSha]
+  });
+  const newCommitSha = newCommit.data.sha;
+  // 7. 更新分支 ref
+  await gh('PATCH', `/repos/${OWNER}/${REPO}/git/refs/heads/${branch}`, {
+    sha: newCommitSha,
+    force: false
   });
 }
 
@@ -645,11 +670,7 @@ function renderPosts() {
 async function deletePost(name, sha) {
   if (!confirm(`确定删除文章「${name}」？此操作不可恢复！`)) return;
   try {
-    // 先获取文件最新 SHA（目录列表的 SHA 可能不准确）
-    const file = await getFile(`_posts/${name}`);
-    if (!file) { toast('文件不存在，请刷新重试', 'error'); return; }
-    console.log('Deleting:', name, 'SHA:', file.sha);
-    await deleteFile(`_posts/${name}`, file.sha);
+    await deleteFile(`_posts/${name}`, sha);
     toast(`✅ 已删除 ${name}`);
     state.posts = state.posts.filter(p => p.name !== name);
     renderPosts();
