@@ -424,6 +424,9 @@ async function saveAffiliate() {
     const content = JSON.stringify(state.affiliateData, null, 2);
     const f = await getFile('config/affiliate_links.json');
     await saveFile('config/affiliate_links.json', content, f ? f.sha : null);
+    // 同步保存到 _data/ 供 Jekyll 前台使用
+    const fd = await getFile('_data/affiliate_links.json');
+    await saveFile('_data/affiliate_links.json', content, fd ? fd.sha : null);
     toast('✅ 推广链接已保存');
     status.textContent = '✅ 已保存'; status.style.color = '#16a34a';
   } catch (e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
