@@ -1,7 +1,7 @@
 """
 自动文章生成器
 ===========
-从模板和数据生成 SEO 文章，无需 AI API
+从模板和数据生成 SEO 文章，支持联盟推广链接
 """
 import os
 import re
@@ -14,6 +14,24 @@ from string import Template
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_DIR = ROOT / "scripts" / "templates"
 OUTPUT_DIR = ROOT / "_posts"
+
+# ---------- 加载联盟推广链接 ----------
+AFFILIATE_FILE = ROOT / "config" / "affiliate_links.json"
+AFFILIATE_LINKS = {}
+if AFFILIATE_FILE.exists():
+    try:
+        with open(AFFILIATE_FILE, "r", encoding="utf-8") as f:
+            AFFILIATE_LINKS = json.load(f).get("products", {})
+        print(f"  [推广] 已加载 {len(AFFILIATE_LINKS)} 个产品的推广链接")
+    except Exception as e:
+        print(f"  [推广] 加载失败: {e}")
+
+def get_affiliate_url(product_name):
+    """获取产品的推广链接，没有则返回空字符串"""
+    info = AFFILIATE_LINKS.get(product_name, {})
+    if isinstance(info, dict):
+        return info.get("url", "")
+    return ""
 
 # ---------- 产品数据 ----------
 # 品类列表，每类包含多个产品
@@ -84,6 +102,8 @@ SECTION_TEMPLATES = """
 
 {price_info}
 
+{affiliate_box}
+
 [👉 访问 {product_name} 官网](https://www.google.com/search?q={product_name_url})
 """
 
@@ -102,6 +122,15 @@ OUTRO_TEMPLATES = [
 ]
 
 CLOSING = """
+---
+
+## 💰 省钱推荐
+
+如果你需要云存储空间，推荐使用 **百度网盘**（国内访问快，2TB 免费空间）。
+通过下方链接注册，你还能获得额外福利👇
+
+[👉 免费领取百度网盘福利](https://pan.baidu.com/)
+
 ---
 
 *本文发布于 {date}，内容仅为个人体验，仅供参考。部分链接可能包含推广链接，但不影响你的购买价格。*
@@ -145,6 +174,17 @@ def generate_post(category_name, category_data, products):
             f"{p['name']} 的基础功能免费，高级功能需要订阅。",
         ])
 
+        # 推广链接 CTA
+        aff_url = get_affiliate_url(p["name"])
+        if aff_url:
+            affiliate_box = f"""
+> 💡 **省钱小贴士**：通过下方链接前往 {p['name']} 官网，享受专属优惠（本站可能有少量推广佣金，不影响你的购买价格）。
+>
+> [👉 前往 {p['name']} 官网获取优惠]({aff_url})
+"""
+        else:
+            affiliate_box = ""
+
         section = SECTION_TEMPLATES.format(
             product_name=p["name"],
             product_desc=p["desc"],
@@ -155,6 +195,7 @@ def generate_post(category_name, category_data, products):
             suitable_for=suitable,
             price_info=price,
             product_name_url=p["url_slug"],
+            affiliate_box=affiliate_box,
         )
         sections.append(section)
 
