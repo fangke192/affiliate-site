@@ -639,7 +639,8 @@ async function deletePost(name, sha) {
   try {
     // 先获取文件最新 SHA（目录列表的 SHA 可能不准确）
     const file = await getFile(`_posts/${name}`);
-    if (!file) { toast('文件不存在', 'error'); return; }
+    if (!file) { toast('文件不存在，请刷新重试', 'error'); return; }
+    console.log('Deleting:', name, 'SHA:', file.sha);
     await deleteFile(`_posts/${name}`, file.sha);
     toast(`✅ 已删除 ${name}`);
     state.posts = state.posts.filter(p => p.name !== name);
@@ -647,7 +648,10 @@ async function deletePost(name, sha) {
     // 触发 Pages 重构建，让前端不再显示已删除的文章
     rebuildToast('触发网站重构建中，约 1-2 分钟后生效...');
     triggerPagesBuild().catch(() => {});
-  } catch(e) { toast('删除失败: ' + e.message, 'error'); }
+  } catch(e) {
+    console.error('Delete error:', e);
+    toast('删除失败: ' + e.message, 'error');
+  }
 }
 
 async function togglePin(name) {
