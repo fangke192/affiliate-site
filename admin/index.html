@@ -298,6 +298,14 @@ async function loadTabData() {
   } else if (state.tab === 'ads') {
     const f = await getFile('_data/ads.yml');
     state.adsData = f ? f.content : '';
+  } else if (state.tab === 'write' || state.tab === 'generate') {
+    // 加载推广数据供下拉框 / 状态显示使用
+    const f = await getFile('config/affiliate_links.json');
+    if (f) {
+      try { state.affiliateData = JSON.parse(f.content); } catch(e) { state.affiliateData = { products: [] }; }
+    } else {
+      state.affiliateData = { products: [] };
+    }
   } else if (state.tab === 'posts') {
     try {
       const items = await listDir('_posts');
@@ -308,13 +316,14 @@ async function loadTabData() {
           const file = await getFile(`_posts/${p.name}`);
           if (file) {
             p.pinned = /^pinned:\s*true/m.test(file.content);
-            p.promotion = (file.content.match(/^promotion:\s*(\S+)/m) || [])[1] || '';
             // 提取分类: categories: [xxx] 或 categories: xxx
             const catMatch = file.content.match(/^categories:\s*\[?([^\}\]\n]+)/m);
             p.category = catMatch ? catMatch[1].trim().replace(/[\[\]'"]/g, '').split(',')[0].trim() : '';
+            p.promotion = file.content.match(/^promotion:\s*(.+)/m)?.[1]?.trim() || '';
           } else {
             p.pinned = false;
             p.category = '';
+            p.promotion = '';
           }
         } catch(e) { p.pinned = false; p.category = ''; }
       }));
@@ -425,9 +434,9 @@ async function saveAffiliate() {
     const content = JSON.stringify(state.affiliateData, null, 2);
     const f = await getFile('config/affiliate_links.json');
     await saveFile('config/affiliate_links.json', content, f ? f.sha : null);
-    // 同步保存到 _data/ 供 Jekyll 前台使用
-    const fd = await getFile('_data/affiliate_links.json');
-    await saveFile('_data/affiliate_links.json', content, fd ? fd.sha : null);
+    // 同步到 _data/ 目录，供 Jekyll 模板读取
+    const f2 = await getFile('_data/affiliate_links.json');
+    await saveFile('_data/affiliate_links.json', content, f2 ? f2.sha : null);
     toast('✅ 推广链接已保存');
     status.textContent = '✅ 已保存'; status.style.color = '#16a34a';
   } catch (e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
@@ -555,9 +564,6 @@ async function saveAds() {
 function renderWrite() {
   const el = document.getElementById('tab-content');
   const cats = ['笔记工具', 'AI 工具', '云存储', '其他'];
-  // 获取已配置推广产品列表
-  const prods = (state.affiliateData && state.affiliateData.products) || [];
-  const hasProds = prods.filter(p => p.name.trim()).length > 0;
   el.innerHTML = `<div class="card">
     <h2>✍️ 手动写文章</h2>
     <p class="hint">手动发布一篇文章，内容会保存到仓库的 _posts 目录，下次构建后展示在网站上。</p>
@@ -572,11 +578,11 @@ function renderWrite() {
       </select>
     </div>
     <div style="margin-bottom:12px;">
-      <label>关联推广产品（选填）</label>
-      <div class="hint">选择后文章底部会自动展示该产品的推广链接</div>
+      <label>推广产品（可选）</label>
+      <div class="hint">选择后文章末尾自动显示推广链接（多条链接时随机选一条）</div>
       <select id="post-promotion">
-        <option value="">— 不关联推广 —</option>
-        ${hasProds ? prods.filter(p => p.name.trim()).map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('') : ''}
+        <option value="">— 不添加推广 —</option>
+        ${renderPromoOptions()}
       </select>
     </div>
     <div style="margin-bottom:12px;">
@@ -591,9 +597,17 @@ function renderWrite() {
   </div>`;
 }
 
+function renderPromoOptions() {
+  const prods = (state.affiliateData && state.affiliateData.products) || [];
+  return prods.filter(p => p.name.trim() && p.urls && p.urls.some(u => u.trim()))
+    .map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}${p.note ? ' — ' + escapeHtml(p.note) : ''}</option>`)
+    .join('');
+}
+
 async function publishPost() {
   const title = document.getElementById('post-title').value.trim();
   const cat = document.getElementById('post-category').value;
+  const promotion = document.getElementById('post-promotion').value;
   const body = document.getElementById('post-body').value.trim();
   if (!title || !body) { toast('请填写标题和正文', 'error'); return; }
 
@@ -609,16 +623,14 @@ async function publishPost() {
     const excerpt = body.replace(/[#*`>\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150) + '...';
     const catSlug = cat === '其他' ? 'general' : cat === '笔记工具' ? 'note-taking' : cat === 'AI 工具' ? 'ai-tools' : 'cloud-storage';
 
-    const promo = document.getElementById('post-promotion')?.value || '';
-    const promoLine = promo ? `promotion: ${promo}
-` : '';
     const frontMatter = `---
 layout: post
 title: "${title}"
 date: ${dateStr} ${timeStr}
 categories: [${catSlug}]
-excerpt: "${excerpt}"
-${promoLine}---
+excerpt: "${excerpt}"${promotion ? `\npromotion: ${promotion}` : ''}
+---
+
 ${body}
 `;
     const fileName = `${slug}.md`;
@@ -656,7 +668,7 @@ function renderPosts() {
     html += `<div class="post-item">
       <div class="post-info">
         <div class="post-title">${escapeHtml(titlePart)} ${p.pinned ? '<span style="color:#eab308;font-size:12px;">📌</span>' : ''}</div>
-        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB${p.category ? ' · ' + p.category : ''}${p.promotion ? ' · 📢 ' + escapeHtml(p.promotion) : ''}</div>
+        <div class="post-meta">${datePart} · ${(p.size / 1024).toFixed(1)} KB${p.category ? ' · ' + p.category : ''}${p.promotion ? ' · 🔗 ' + escapeHtml(p.promotion) : ''}</div>
       </div>
       <div class="post-actions">
         <button class="btn ${pinBtnClass} btn-xs" onclick="togglePin('${safeName}')">${pinText}</button>
@@ -723,81 +735,44 @@ async function togglePin(name) {
 function renderGenerate() {
   const el = document.getElementById('tab-content');
   const prods = (state.affiliateData && state.affiliateData.products) || [];
-  const hasProds = prods.filter(p => p.name.trim()).length > 0;
+  const validProds = prods.filter(p => p.name.trim() && p.urls && p.urls.some(u => u.trim()));
   el.innerHTML = `
     <div class="card">
-      <h2>⚡ 批量分配推广</h2>
-      <p class="hint">给没有设置推广的文章自动分配一个随机推广产品，文章内容不会被修改。</p>
+      <h2>⚡ 自动生成文章</h2>
+      <p class="hint">触发 GitHub Actions 工作流，自动生成新的 SEO 文章并部署到网站。文章末尾会自动带上你配置的推广链接。</p>
       <div style="margin-bottom:16px;">
-        <button class="btn btn-primary" onclick="batchAssignPromo()" id="gen-btn">🚀 给所有文章分配推广</button>
+        <button class="btn btn-primary" onclick="triggerWorkflow()" id="gen-btn">🚀 立即生成文章</button>
         <span id="gen-status" class="save-status"></span>
       </div>
-      ${!hasProds ? '<div style="background:#fef2f2;border-radius:8px;padding:12px;font-size:13px;color:#ef4444;margin-bottom:8px;">⚠️ 你还没有配置推广产品，请先去「推广」tab 添加产品和链接。</div>' : ''}
       <div style="background:#f9fafb;border-radius:8px;padding:16px;font-size:13px;color:#666;margin-bottom:8px;">
-        <strong>说明：</strong><br>
-        • 只给 <strong>没有设置推广</strong> 的文章分配<br>
-        • 从你配置的推广产品中随机选一个<br>
-        • 已分配推广的文章不会重复处理<br>
-        • 分配后自动触发 Pages 构建
+        <strong>自动化说明：</strong><br>
+        • 每周一 00:00 UTC 自动运行<br>
+        • 每次随机选取 3 个分类生成对比评测文章<br>
+        • 文章自动带上你配置的推广链接（多条随机选一条）<br>
+        • 生成后自动部署到 GitHub Pages<br>
+        ${validProds.length > 0 ? '• ✅ 已配置 ' + validProds.length + ' 个推广产品' : '• ⚠️ 未检测到推广链接，文章将不包含推广内容'}
       </div>
     </div>
     <div class="card">
       <h2>📋 快捷操作</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" class="btn btn-outline btn-sm">GitHub 仓库</a>
+        <a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" class="btn btn-outline btn-sm">查看工作流运行记录</a>
+        <a href="https://github.com/${OWNER}/${REPO}/" target="_blank" class="btn btn-outline btn-sm">GitHub 仓库</a>
         <a href="https://${OWNER}.github.io/${REPO}/" target="_blank" class="btn btn-outline btn-sm">查看网站</a>
         <button class="btn btn-outline btn-sm" onclick="triggerPagesBuild()">手动触发 Pages 构建</button>
       </div>
     </div>`;
 }
 
-async function batchAssignPromo() {
+async function triggerWorkflow() {
   const btn = document.getElementById('gen-btn');
   const status = document.getElementById('gen-status');
-  btn.disabled = true; status.innerHTML = '<span class="spinner"></span> 分配中...';
+  btn.disabled = true; status.innerHTML = '<span class="spinner"></span> 触发中...';
   try {
-    // 获取已配置的推广产品（需要有链接的才算）
-    const prods = (state.affiliateData && state.affiliateData.products) || [];
-    const validProds = prods.filter(p => p.name.trim() && p.urls && p.urls.some(u => u.trim()));
-    if (validProds.length === 0) {
-      status.textContent = '❌ 没有可用的推广产品，请先配置推广链接';
-      status.style.color = '#ef4444'; btn.disabled = false; return;
-    }
-
-    // 获取所有文章
-    const items = await listDir('_posts');
-    const posts = items.filter(i => i.name.endsWith('.md'));
-    if (posts.length === 0) {
-      status.textContent = '❌ 没有文章需要处理'; status.style.color = '#ef4444';
-      btn.disabled = false; return;
-    }
-
-    let assigned = 0;
-    for (const post of posts) {
-      const file = await getFile(`_posts/${post.name}`);
-      if (!file) continue;
-      // 跳过已有 promotion 的文章
-      if (/^promotion:\s*\S+/m.test(file.content)) continue;
-
-      // 随机选一个推广产品
-      const pick = validProds[Math.floor(Math.random() * validProds.length)];
-      // 在 front matter 中插入 promotion 字段
-      let newContent = file.content.replace(/^---\n/, `---\npromotion: ${pick.name}\n`);
-      await saveFile(`_posts/${post.name}`, newContent, file.sha);
-      assigned++;
-    }
-
-    status.textContent = `✅ 已为 ${assigned} 篇文章分配推广`;
-    status.style.color = '#16a34a';
-    toast(\`✅ 已为 \${assigned} 篇文章分配推广，触发构建中...\`);
-    rebuildToast('触发网站重构建中，约 1-2 分钟后生效...');
-    triggerPagesBuild().catch(() => {});
-    // 刷新文章列表
-    loadTabData();
-  } catch(e) {
-    status.textContent = '❌ ' + e.message; status.style.color = '#ef4444';
-    toast('分配失败: ' + e.message, 'error');
-  }
+    await gh('POST', `/repos/${OWNER}/${REPO}/actions/workflows/deploy.yml/dispatches`, { ref: BRANCH });
+    toast('✅ 已触发文章生成！约 2-3 分钟后完成');
+    status.innerHTML = '✅ 已触发！<a href="https://github.com/${OWNER}/${REPO}/actions" target="_blank" style="color:#2563eb;">查看进度</a>';
+  } catch(e) { status.textContent = '❌ ' + e.message; status.style.color = '#ef4444'; }
   btn.disabled = false;
 }
 
