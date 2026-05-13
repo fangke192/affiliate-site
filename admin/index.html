@@ -433,11 +433,8 @@ async function saveAffiliate() {
 // ===================== ADS TAB =====================
 function renderAds() {
   const el = document.getElementById('tab-content');
-  // Parse YAML to extract data
   const yml = state.adsData || '';
   const enabled = /^enabled:\s*(true)/m.test(yml);
-  const postBottom = extractYamlArray(yml, 'post_bottom');
-  const homeBottom = extractYamlArray(yml, 'home_bottom');
 
   function extractYamlArray(y, key) {
     const re = new RegExp(`^${key}:\\s*\\n((?:\\s+-\\s+['"].*?['"]\\n?)*)`, 'm');
@@ -445,7 +442,6 @@ function renderAds() {
     if (m) {
       return [...m[1].matchAll(/-\s+['"](.*?)['"]\s*$/gm)].map(x => x[1]);
     }
-    // Single line format
     const singleRe = new RegExp(`^${key}:\\s*\\[(.*?)\\]`, 'm');
     const singleM = y.match(singleRe);
     if (singleM && singleM[1].trim()) {
@@ -463,6 +459,13 @@ function renderAds() {
     return y;
   }
 
+  // 用 window._adCodes 作为实时数据源，避免 YAML 重复解析覆盖
+  if (!window._adCodes || !window._adCodes._inited) {
+    window._adCodes = { _inited: true };
+    window._adCodes.postBottom = extractYamlArray(yml, 'post_bottom');
+    window._adCodes.homeBottom = extractYamlArray(yml, 'home_bottom');
+  }
+
   el.innerHTML = `<div class="card">
     <h2>📢 广告管理</h2>
     <p class="hint">每个位置可添加多条广告代码，网站构建时会随机选一条展示。<br>支持百度联盟、Google AdSense 等任意广告代码。</p>
@@ -475,12 +478,12 @@ function renderAds() {
     </div>
     <div style="margin-bottom:16px;">
       <label>文章底部广告</label><div class="hint">展示在每篇文章底部</div>
-      <div id="post-bottom-list">${renderAdCodes('postBottom', postBottom)}</div>
+      <div id="post-bottom-list">${renderAdCodes('postBottom', window._adCodes.postBottom)}</div>
       <button class="btn btn-outline btn-xs" onclick="addAdCode('postBottom')">+ 添加广告代码</button>
     </div>
     <div style="margin-bottom:16px;">
       <label>首页底部广告</label><div class="hint">展示在首页底部</div>
-      <div id="home-bottom-list">${renderAdCodes('homeBottom', homeBottom)}</div>
+      <div id="home-bottom-list">${renderAdCodes('homeBottom', window._adCodes.homeBottom)}</div>
       <button class="btn btn-outline btn-xs" onclick="addAdCode('homeBottom')">+ 添加广告代码</button>
     </div>
     <div>
@@ -490,8 +493,6 @@ function renderAds() {
   </div>`;
 
   function renderAdCodes(key, codes) {
-    if (!window._adCodes) window._adCodes = {};
-    window._adCodes[key] = codes;
     return codes.map((c, i) => `
       <div class="url-row" style="margin-bottom:6px;">
         <textarea rows="2" style="font-family:monospace;font-size:12px;margin:0;flex:1;min-height:40px;" onchange="updateAdCode('${key}',${i},this.value)" placeholder="粘贴广告代码（HTML/JS）">${escapeHtml(c)}</textarea>
