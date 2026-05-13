@@ -1,0 +1,26 @@
+---
+layout: default
+title: 首页
+---
+
+<div class="hero">
+  <h1>📋 工具推荐站</h1>
+  <p class="hero-desc">精选实用工具评测与推荐，帮你找到最适合的产品</p>
+</div>
+
+<div class="post-grid">
+  {% for post in site.posts %}
+  <div class="post-card">
+    <div class="post-meta">{{ post.date | date: "%Y-%m-%d" }}</div>
+    <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+    <p class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</p>
+    <a href="{{ post.url | relative_url }}" class="read-more">阅读全文 →</a>
+  </div>
+  {% endfor %}
+</div>
+
+{% if site.posts.size == 0 %}
+<div class="empty-state">
+  <p>🏗️ 文章正在生成中，请稍后再来...</p>
+</div>
+{% endif %}
