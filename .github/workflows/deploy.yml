@@ -1,0 +1,32 @@
+name: Generate & Deploy
+
+on:
+  schedule:
+    # 每周一早上 8 点运行
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate posts
+        run: python scripts/generate_posts.py
+
+      - name: Commit new posts
+        run: |
+          git config user.name "Bounty Bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add site/_posts/
+          git diff --cached --quiet || git commit -m "auto: generate new posts"
+          git push
